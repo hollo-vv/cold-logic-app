@@ -1,0 +1,14 @@
+COLD LOGIC - get an Android app (APK) with no setup on your computer
+
+1. On github.com create a NEW repository (for example: cold-logic-app). Keep it separate from your website repo.
+2. Upload everything in this folder to it, INCLUDING the hidden-looking ".github" folder.
+   If the ".github" folder does not upload: in the repo click Add file > Create new file, type
+   .github/workflows/build-apk.yml as the name, and paste in the contents of that file.
+3. Open the repo's "Actions" tab. If asked, click "I understand my workflows, go ahead and enable them".
+4. Pick "Build Android APK" on the left and click "Run workflow". Wait about 5 to 8 minutes.
+5. Open the finished run, scroll to "Artifacts", download "ColdLogic-APK". Unzip it to get app-debug.apk.
+6. Send app-debug.apk to your phone and open it. Allow "Install unknown apps" when asked.
+7. Open the app and allow notifications. In Settings > Apps > COLD LOGIC set battery to "Unrestricted",
+   and allow "Alarms & reminders" so reminders arrive on time while the phone is locked.
+
+Updating later: replace the files in the repo with the new www folder and run the workflow again.
