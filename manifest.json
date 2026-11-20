@@ -1,0 +1,31 @@
+{
+  "id": "./",
+  "name": "𝙲𝙾𝙻𝙳 𝙻𝙾𝙶𝙸𝙲",
+  "short_name": "COLD LOGIC",
+  "description": "Daily planner: routine, classes, work-outs, fuel, exams, streaks and XP.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#09090d",
+  "theme_color": "#000000",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "categories": ["productivity", "education", "health"],
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "screenshots": [
+    {"src": "screenshots/day.png", "sizes": "780x1688", "type": "image/png", "form_factor": "narrow", "label": "Daily routine with progress ring and streak"},
+    {"src": "screenshots/academics.png", "sizes": "780x1688", "type": "image/png", "form_factor": "narrow", "label": "Classes with course code, room and type"},
+    {"src": "screenshots/wide.png", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Desktop view"}
+  ],
+  "shortcuts": [
+    {"name": "Day", "short_name": "Day", "url": "./#day", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Academics", "short_name": "Classes", "url": "./#academics", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Work-out", "short_name": "Work-out", "url": "./#workout", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]}
+  ]
+}
