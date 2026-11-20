@@ -1,0 +1,52 @@
+name: Build Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Install
+        run: npm install
+      - name: Add Android project
+        run: npx cap add android
+      - name: App name
+        run: |
+          S=android/app/src/main/res/values/strings.xml
+          sed -i 's#>COLD LOGIC<#>𝙲𝙾𝙻𝙳 𝙻𝙾𝙶𝙸𝙲<#g' $S
+          cat $S
+      - name: App icon (COLD LOGIC logo)
+        run: |
+          pip install pillow
+          python3 tools/make_icons.py android/app/src/main/res www/icons
+      - name: Permissions (reminders, boot, microphone for the visualizer)
+        run: |
+          M=android/app/src/main/AndroidManifest.xml
+          for P in POST_NOTIFICATIONS SCHEDULE_EXACT_ALARM RECEIVE_BOOT_COMPLETED VIBRATE RECORD_AUDIO MODIFY_AUDIO_SETTINGS; do
+            sed -i "s#</manifest>#    <uses-permission android:name=\"android.permission.$P\" />\n</manifest>#" $M
+          done
+      - name: Sync web files
+        run: npx cap sync android
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          for i in 1 2 3; do
+            ./gradlew assembleDebug --refresh-dependencies && exit 0
+            echo "Attempt $i failed, retrying in 30s"
+            sleep 30
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ColdLogic-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
