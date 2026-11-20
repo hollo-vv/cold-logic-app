@@ -19,9 +19,15 @@ jobs:
         run: npm install
       - name: Add Android project
         run: npx cap add android
-      - name: App icon
-        continue-on-error: true
-        run: npx @capacitor/assets generate --android --iconBackgroundColor '#09090d' --iconBackgroundColorDark '#09090d'
+      - name: App name
+        run: |
+          S=android/app/src/main/res/values/strings.xml
+          sed -i 's#>COLD LOGIC<#>𝙲𝙾𝙻𝙳 𝙻𝙾𝙶𝙸𝙲<#g' $S
+          cat $S
+      - name: App icon (COLD LOGIC logo)
+        run: |
+          pip install pillow
+          python3 tools/make_icons.py android/app/src/main/res www/icons
       - name: Permissions (reminders, boot, microphone for the visualizer)
         run: |
           M=android/app/src/main/AndroidManifest.xml
