@@ -351,6 +351,11 @@ jobs:
             sleep 30
           done
           exit 1
+      - name: Show which key signed the APK
+        run: |
+          keytool -list -v -keystore ~/.android/debug.keystore -storepass android 2>/dev/null | grep -E "SHA256|Alias"
+          APKSIGNER=$(ls $ANDROID_HOME/build-tools/*/apksigner | tail -1)
+          $APKSIGNER verify --print-certs android/app/build/outputs/apk/debug/app-debug.apk | grep -E "SHA-256"
       - name: Give the APK a unique name
         run: cp android/app/build/outputs/apk/debug/app-debug.apk ColdLogic-build${{ github.run_number }}.apk
       - uses: actions/upload-artifact@v4
