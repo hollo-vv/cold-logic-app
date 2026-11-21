@@ -19,6 +19,21 @@ jobs:
         run: npm install
       - name: Add Android project
         run: npx cap add android
+      - name: Use your permanent signing key
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS" ]; then
+            mkdir -p ~/.android
+            echo "$KS" | base64 -d > ~/.android/debug.keystore
+            echo "Using your permanent signing key: new builds can update the installed app"
+          else
+            echo "::warning::No ANDROID_KEYSTORE_B64 secret found. This build gets a random key and cannot update an installed app."
+          fi
+      - name: Version number
+        run: |
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/; s/versionName \"[^\"]*\"/versionName \"1.${{ github.run_number }}\"/" android/app/build.gradle
+          grep -n "versionCode\|versionName" android/app/build.gradle
       - name: App name
         run: |
           S=android/app/src/main/res/values/strings.xml
@@ -342,4 +357,3 @@ jobs:
         with:
           name: ColdLogic-build${{ github.run_number }}
           path: ColdLogic-build${{ github.run_number }}.apk
-
