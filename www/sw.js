@@ -1,6 +1,6 @@
 /* COLD LOGIC service worker: offline support + notification clicks.
    Network first, so a new deploy shows up the next time the app opens online. */
-const CACHE = 'coldlogic-v17';
+const CACHE = 'coldlogic-v19';
 const SCHED = 'coldlogic-sched';   /* reminder snapshot written by the app, read here when the app is closed */
 const FILES = ['./', 'index.html', 'manifest.json', 'firebase-config.js',
   'assets/profile.jpg', 'assets/logo.png', 'assets/physique.jpg', 'assets/academics.jpg',

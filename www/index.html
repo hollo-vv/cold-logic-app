@@ -1229,7 +1229,7 @@ function notifCard(){
     txt='You get a reminder before each class with the subject, class type, room and any open submissions or notes for that subject. Submissions with a due date also remind you the evening before and that morning.';
     btns=`<button class="btn sm" data-act="notiftest">Send a test</button><button class="btn sm ghost" data-act="notifoff">Turn off</button>`;
     const nx=Notif.next(),bgTxt={native:'Scheduled on your phone',periodic:'Background sync (best effort)',trigger:'Scheduled by the browser',open:'Only while the app is open'}[Notif.bg]||'Only while the app is open';
-    diag=`<div style="margin-top:12px;padding-top:8px;border-top:1px solid var(--line)">${row('Notifications','Allowed')}${row('Installed on home screen',Notif.native()||Notif.standalone()?'Yes':'No')}${row('Delivery when closed',bgTxt)}${row('Next reminder',nx?esc(Notif.titleOf(nx))+' · '+new Date(nx.from).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'None soon')}</div>
+    diag=`<div style="margin-top:12px;padding-top:8px;border-top:1px solid var(--line)">${row('Notifications','Allowed')}${row('Installed on home screen',Notif.native()||Notif.standalone()?'Yes':'No')}${row('Delivery when closed',bgTxt)}${Notif.native()&&Notif.pendingN!=null?row('Reminders waiting on the phone',Notif.pendingN):''}${row('Next reminder',nx?esc(Notif.titleOf(nx))+' · '+new Date(nx.from).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'None soon')}</div>
       <div class="fld" style="margin-top:12px"><label>Remind me before class</label><select data-f="classlead" aria-label="Class reminder lead time">${[10,15,20,30,45,60].map(v=>`<option value="${v}" ${Notif.lead()===v?'selected':''}>${v} minutes</option>`).join('')}</select></div>`;
     if(Notif.bg==='open'&&!Notif.native())diag+=`<p class="sm mu" style="margin-top:10px">A website cannot wake a closed app on its own. For reminders while your phone is locked, install the app to your Home Screen, keep it allowed to run in the background, or use the Android app version. Reminders always fire while the app is open or running in the background.</p>`;
   }
@@ -2135,7 +2135,11 @@ AlertSnd.refresh();
 /* ---------- class reminders ---------- */
 const Notif={
   supported:'Notification' in window,nperm:null,bg:'open',
-  native(){return !!(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications)},
+  /* The Android app has no bundler, so the plugin is not always on Capacitor.Plugins: register it by name. */
+  LN(){try{const C=window.Capacitor;if(!C)return null;if(C.Plugins&&C.Plugins.LocalNotifications)return C.Plugins.LocalNotifications;
+    if(C.registerPlugin&&(!C.isNativePlatform||C.isNativePlatform()))return this._ln||(this._ln=C.registerPlugin('LocalNotifications'))}catch(e){}return null},
+  pendingN:null,
+  native(){return !!this.LN()},
   perm(){if(this.native())return this.nperm||'default';return this.supported?Notification.permission:'unsupported'},
   standalone(){try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}},
   sent(){try{return JSON.parse(localStorage.getItem('coldlogic.sent')||'{}')}catch(e){return {}}},
@@ -2145,10 +2149,10 @@ const Notif={
     s[k]=Date.now();try{localStorage.setItem('coldlogic.sent',JSON.stringify(s))}catch(e){}
     try{navigator.serviceWorker&&navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:'fired',key:k})}catch(e){}
   },
-  async refreshNative(){if(!this.native())return;try{const r=await Capacitor.Plugins.LocalNotifications.checkPermissions();this.nperm=r.display==='granted'?'granted':r.display==='denied'?'denied':'default'}catch(e){}},
+  async refreshNative(){if(!this.native())return;try{const r=await this.LN().checkPermissions();this.nperm=r.display==='granted'?'granted':r.display==='denied'?'denied':'default'}catch(e){}},
   async ask(){
     if(this.native()){
-      try{const r=await Capacitor.Plugins.LocalNotifications.requestPermissions();this.nperm=r.display==='granted'?'granted':r.display==='denied'?'denied':'default'}catch(e){}
+      try{const r=await this.LN().requestPermissions();this.nperm=r.display==='granted'?'granted':r.display==='denied'?'denied':'default'}catch(e){}
     }else{
       if(!this.supported){toast('Notifications are not supported on this device');return 'unsupported'}
       if(Notification.permission==='default'){try{await Notification.requestPermission()}catch(e){}}
@@ -2218,7 +2222,7 @@ const Notif={
   async show(title,body,tag,at,url){
     const opt={body,tag,renotify:true,icon:'icons/icon-192.png',badge:'icons/icon-192.png',vibrate:[80,40,80],data:{url:url||'./#academics'}};
     if(this.native()){
-      try{await Capacitor.Plugins.LocalNotifications.schedule({notifications:[{id:this.hash(tag+Date.now()),title,body,schedule:{at:new Date(Date.now()+700)},extra:{url:opt.data.url}}]});return true}catch(e){return false}
+      try{await this.LN().schedule({notifications:[{id:this.hash(tag+Date.now()),title,body,schedule:{at:new Date(Date.now()+700)},extra:{url:opt.data.url}}]});return true}catch(e){return false}
     }
     if(at&&window.TimestampTrigger)opt.showTrigger=new TimestampTrigger(at);
     try{
@@ -2246,15 +2250,17 @@ const Notif={
      the installed Android app (exact local notifications), Chrome's scheduled notifications,
      or the service worker's background sync. A plain web page cannot wake itself. */
   async plan(){
+    if(this.native()&&this.nperm==null)await this.refreshNative();
     if(!S.notify&&!S.alert.on)return;
     const list=this.list(this.native()?7:3);
     if(this.native()){
       if(!S.notify||this.perm()!=='granted')return;
       this.bg='native';
-      const LN=Capacitor.Plugins.LocalNotifications,now=Date.now();
+      const LN=this.LN(),now=Date.now();
       try{const p=await LN.getPending();if(p.notifications&&p.notifications.length)await LN.cancel({notifications:p.notifications})}catch(e){}
       const items=list.filter(e=>e.from>now&&(e.kind!=='class'||S.notify)).slice(0,60).map(e=>({id:this.hash(e.key),title:this.titleOf(e),body:this.text(e,null),schedule:{at:new Date(e.from),allowWhileIdle:true},extra:{url:e.url}}));
-      if(items.length){try{await LN.schedule({notifications:items})}catch(e){}}
+      if(items.length){try{await LN.schedule({notifications:items})}catch(e){toast('Could not schedule reminders on the phone')}}
+      try{const q=await LN.getPending();this.pendingN=(q.notifications||[]).length}catch(e){this.pendingN=null}
       return;
     }
     if(!S.notify||this.perm()!=='granted'||!('serviceWorker' in navigator))return;
@@ -2277,7 +2283,7 @@ const Notif={
     toast(ok?'Test sent. Pull down your notifications to see it.':'Could not show it. Check this app’s notification settings in your phone.');
   }
 };
-Notif.refreshNative();
+Notif.refreshNative().then(()=>{Notif.plan();Notif.check()});
 
 /* ---------- custom backgrounds ---------- */
 const BG_SOLID=['#0b0b10','#101a2c','#1b1030','#0f2a24','#2a1215','#2b2410','#1f1f24','#12202e','#1a1a2e','#10261c','#2d1b2e','#0d1f3c'];
