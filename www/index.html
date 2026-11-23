@@ -869,6 +869,56 @@ button,.nav,.card,.cd,.tick{touch-action:manipulation}
 #upd.in{transform:none}
 #upd>div{flex:1;display:flex;flex-direction:column;font-size:13px}
 #upd b{font-size:14px}#upd span{color:var(--mu)}
+/* v23 */
+.heat{background:#000;border-color:rgba(255,255,255,.1)}
+.hwrap{position:relative;margin-top:12px}
+.hmo{display:grid;gap:3px;font-size:10px;color:var(--mu2);margin-bottom:4px;height:12px}
+.hmo span{white-space:nowrap;overflow:visible}
+.hgrid{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;gap:3px}
+.hc{aspect-ratio:1;width:100%;border-radius:4px;display:block;padding:0;border:0;min-width:0}
+.hz{aspect-ratio:1;display:block}
+.hc.h0{background:#1a2230}
+.hc.h1{background:#0f5b63}
+.hc.h2{background:#17b6c9}
+.hc.h3{background:#2dffb4;box-shadow:0 0 8px rgba(45,255,180,.75),0 0 2px #b8ffe8 inset}
+.hc.td{outline:1.5px solid #fff;outline-offset:1px}
+.hc.sel{outline:2px solid #fff;outline-offset:1px;transform:scale(1.15)}
+.hleg{display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:10px;font-size:11px;color:var(--mu2)}
+.hleg .hc{width:12px;height:12px;aspect-ratio:auto;border-radius:3px}
+.htip{position:absolute;z-index:5;background:#0b0b10;border:1px solid var(--line2);border-radius:10px;padding:8px 11px;font-size:12px;line-height:1.5;display:flex;flex-direction:column;white-space:nowrap;box-shadow:0 10px 30px -8px #000;pointer-events:none}
+.htip[hidden]{display:none}
+.htip b{font-size:12px}
+.htip span{color:var(--mu)}
+.wd{display:flex;align-items:center;gap:12px;border-color:rgba(251,146,60,.35);background:linear-gradient(135deg,rgba(251,146,60,.1),rgba(139,92,246,.06))}
+.wd.on{border-color:rgba(220,38,38,.5)}
+.wd p{margin:2px 0 0}
+.wdi{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(251,146,60,.16);color:#fb923c;flex:none}
+.sdots{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.sd{width:18px;height:18px;border-radius:5px;background:#1a2230;display:block}
+.sd.ok{background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.6)}
+.sd.late{background:#7f1d1d}
+#lo{position:fixed;inset:0;z-index:9990;display:grid;place-items:center;padding:24px;background:rgba(10,0,0,.9);opacity:0;transition:opacity .3s}
+#lo.in{opacity:1}
+.lo-c{width:100%;max-width:360px;text-align:center;color:#f6d9c4}
+.lo-c h2{font-family:var(--serif);font-size:34px;margin:10px 0 6px;color:#fca5a5}
+.lo-c p{margin:0 0 10px;color:#c9a58f}
+.lo-s{font-size:14px}
+.lo-m{width:72px;height:72px;margin:0 auto;border-radius:50%;display:grid;place-items:center;color:#f59e0b;background:rgba(220,38,38,.18);box-shadow:0 0 40px rgba(220,38,38,.4)}
+.lo-m svg{width:34px;height:34px}
+.lo-n{margin-top:14px;padding:10px 18px;color:#a5826c;font-size:14px}
+html[data-night]{--acc:#dc2626;--acc2:#f59e0b;--vi:#dc2626;--cy:#f59e0b;--am:#f59e0b;--ro:#dc2626;--em:#d97706;--or:#ea580c;--tx:#f1d9c8;--mu:#a5826c;--mu2:#7a5b4a;--bg:#070303;--s1:#120a09;--s2:#1b100e}
+html[data-night] #app,html[data-night] #app[data-view]{--acc:#dc2626;--acc2:#f59e0b}
+html[data-night] .btn,html[data-night] .toast{color:#1a0505}
+html[data-night] .hc.h2{background:#b45309}
+html[data-night] .hc.h3{background:#fbbf24;box-shadow:0 0 8px rgba(251,191,36,.7)}
+html[data-night] .hc.h1{background:#7f1d1d}
+#fxflash{position:fixed;inset:0;z-index:9980;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 45%,transparent 0 18%,rgba(45,255,180,.0) 19%)}
+#fxflash.go{animation:fxf 1s ease-out both}
+#fxflash::before{content:"";position:absolute;left:50%;top:45%;width:30vmax;height:30vmax;margin:-15vmax 0 0 -15vmax;border-radius:50%;border:3px solid var(--fx,#2dffb4);box-shadow:0 0 40px var(--fx,#2dffb4),inset 0 0 40px var(--fx,#2dffb4)}
+@keyframes fxf{0%{opacity:.0}10%{opacity:.8}100%{opacity:0}}
+#fxflash.go::before{animation:fxr 1s cubic-bezier(.1,.6,.2,1) both}
+@keyframes fxr{from{transform:scale(.2)}to{transform:scale(3.2)}}
+@media (prefers-reduced-motion:reduce){#fxflash.go,#fxflash.go::before{animation:none}}
 </style>
 </head>
 <body>
@@ -1032,7 +1082,7 @@ function defaults(){
     tt,wk,routine,exams:[],
     habits:[['Workout','💪',3,[1,2,3,5,6]],['Sandhya Vandhanam','🙏',0,[0,1,2,3,4,5,6]],['Reading','📖',2,[0,1,2,3,4,5,6]],['Hydration','💧',1,[0,1,2,3,4,5,6]],['Study Session','🎯',4,[1,2,3,4,5,6]]].map((h,i)=>({id:'h_seed'+i,n:h[0],ic:h[1],col:['#8b5cf6','#22d3ee','#fbbf24','#34d399','#fb7185'][h[2]],days:h[3],log:{},created:iso(new Date())})),
     todos:[],diary:{pin:'',salt:'',entries:[]},
-    skip:{},ready:{},shield:{n:0,used:[],chk:''},alerts:[],spend:[],xpOpen:{},lifts:{},prs:{},prLog:[],focus:{log:[],broken:[]},rewards:{},
+    skip:{},ready:{},shield:{n:0,used:[],chk:''},alerts:[],spend:[],xpOpen:{},xpDay:{},sleep:{cutoff:'22:20',on:true,log:{}},lifts:{},prs:{},prLog:[],focus:{log:[],broken:[]},rewards:{},
     staples:[['Protein shake',150,25],['2 boiled eggs',155,13],['Greek yogurt',100,10],['Paneer 100g',265,18],['Peanut butter toast',260,10]].map((s,i)=>({id:'s_seed'+i,n:s[0],kcal:s[1],p:s[2]}))
   };
 }
@@ -1064,7 +1114,7 @@ function fixup(){
   if(!Array.isArray(S.diary.entries))S.diary.entries=[];
   if(typeof S.diary.pin!=='string')S.diary.pin='';if(typeof S.diary.salt!=='string')S.diary.salt='';
   const O=k=>{if(!S[k]||typeof S[k]!=='object'||Array.isArray(S[k]))S[k]={}},A=k=>{if(!Array.isArray(S[k]))S[k]=[]};
-  ['skip','ready','xpOpen','lifts','prs','rewards'].forEach(O);['alerts','spend','prLog'].forEach(A);
+  ['skip','ready','xpOpen','lifts','prs','rewards','xpDay'].forEach(O);S.sleep=Object.assign({cutoff:'22:20',on:true},S.sleep||{});if(!S.sleep.log||typeof S.sleep.log!=='object')S.sleep.log={};['alerts','spend','prLog'].forEach(A);
   O('shield');if(typeof S.shield.n!=='number')S.shield.n=0;if(!Array.isArray(S.shield.used))S.shield.used=[];if(typeof S.shield.chk!=='string')S.shield.chk='';
   O('focus');if(!Array.isArray(S.focus.log))S.focus.log=[];if(!Array.isArray(S.focus.broken))S.focus.broken=[];
   if(!Array.isArray(S.staples))S.staples=d.staples;
@@ -1089,7 +1139,7 @@ let saveT;
 function save(){clearTimeout(saveT);saveT=setTimeout(flush,120)}
 function flush(){
   try{
-    const p=persistable(),j=syncJSON(p);
+    xpTrack();const p=persistable(),j=syncJSON(p);
     if(!Sync.applying&&j!==Sync.lastJ){S._u=Date.now();Sync.lastJ=j;Sync.dirty()}
     p._u=S._u;
     localStorage.setItem(KEY,JSON.stringify(p));
@@ -1330,7 +1380,7 @@ function vDay(){
   h+=`<section class="card hero">${ringHtml(150)}<div class="grow"><div class="eyebrow">${DAYS[wd]}</div><div class="h2">${greeting()}</div>
   <p class="mu sm" style="margin-top:6px"><span data-done>0</span> of <span data-total>0</span> done · ${STREAK_PCT}% keeps your streak</p>
   <div class="stats"><span class="chip streak">${ic('flame')}<span data-streak>0</span> day streak</span><span class="chip" style="color:var(--am)">${ic('bolt')}<span data-xp>0</span> XP</span></div></div></section>`;
-  h+=readyCard();
+  h+=Sleep.banner();h+=readyCard();
   h+=`<section class="card"><div class="mrow"><span class="eyebrow">Level <b style="font-family:var(--serif);font-size:20px;color:var(--tx)" data-lv>1</b></span><span class="sm mu" data-xpin></span></div><div class="xpbar" data-xpbar><i></i></div></section>`;
   h+=shieldCard();h+=sundayBanner();h+=habitsToday();
   if(!S.name)h+=`<section class="card banner"><div class="grow"><b>Make it yours</b><p class="mu sm">Add your name and photo.</p></div><button class="btn sm" data-go="profile">Set up</button></section>`;
@@ -1457,7 +1507,8 @@ function vEdit(){
   let h=`<div class="seg" role="tablist">${tabs.map(([k,n])=>`<button role="tab" class="${etab===k?'on':''}" data-act="etab" data-k="${k}">${n}</button>`).join('')}</div><div class="stagger">${['tt','wk','rt'].includes(etab)?'<p class="sm mu" style="margin:0 2px 2px">This is your weekly template: changes here apply every week. To change just one day, tap the pencil on that day in Day, Academics or Work-out.</p>':''}`;
   if(etab==='gen'){
     const hp=S.haptic,sf=S.sfx,canV=!!navigator.vibrate;
-    h+=`<section class="card"><div class="eyebrow" style="margin-bottom:10px">App version</div><div class="setrow"><div><b>${APP_VER}</b><div class="sm mu" style="margin-top:4px">The app checks for updates by itself.</div></div><button class="btn sm" data-x="updchk">Check now</button></div></section>
+    h+=`${sleepSettings()}
+    <section class="card"><div class="eyebrow" style="margin-bottom:10px">App version</div><div class="setrow"><div><b>${APP_VER}</b><div class="sm mu" style="margin-top:4px">The app checks for updates by itself.</div></div><button class="btn sm" data-x="updchk">Check now</button></div></section>
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">Diary</div><div class="setrow"><div><b>Diary passcode</b><div class="sm mu" style="margin-top:4px">4-digit code asked every time the diary opens.</div></div><button class="btn sm" data-x="dpass">${ic('lock')}${S.diary.pin?'Change Diary Passcode':'Set Diary Passcode'}</button></div></section>
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">Background</div>
      <div class="fld"><label>Applies to</label><select data-f="bgtarget" aria-label="Background target"><option value="all" ${bgTarget==='all'?'selected':''}>All sections</option>${Object.keys(VIEWS).map(k=>`<option value="${k}" ${bgTarget===k?'selected':''}>${esc(VIEWS[k].t)}</option>`).join('')}</select></div>
@@ -1646,11 +1697,13 @@ function vProfile(){
    <section class="card"><div class="grid2"><div class="tile"><small>Level</small><div class="big" data-lv>1</div></div><div class="tile"><small>Total XP</small><div class="big" data-xp>0</div></div><div class="tile"><small>Current streak</small><div class="big"><span data-streak>0</span> days</div></div><div class="tile"><small>Best streak</small><div class="big"><span data-best>0</span> days</div></div></div>
    <div class="xpbar" data-xpbar style="margin-top:14px"><i></i></div><p class="sm mu" style="margin-top:8px">${done} day${done===1?'':'s'} finished at ${STREAK_PCT}% or more.</p></section>
    ${reportCard()}
+   ${heatCard()}
+   ${sleepCard()}
    ${installEvt?`<section class="card row2"><div class="grow"><b>Install the app</b><p class="sm mu">Adds 𝙲𝙾𝙻𝙳 𝙻𝙾𝙶𝙸𝙲 to your home screen or desktop.</p></div><button class="btn" data-act="install">Install</button></section>`:''}</div>`;
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611230254',WEB_URL='https://benevolent-gumption-81dafb.netlify.app/',APK_URL='https://github.com/hollo-vv/cold-logic-app/actions';
+const APP_VER='202611230759',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/actions';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -1693,6 +1746,204 @@ const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
     this.timer=setInterval(()=>{if(!document.hidden&&!(this.snooze>Date.now()))this.check(false)},15*60000);
   }
 };
+
+/* ================= v23: heatmap · sleep cutoff · beat-sync visualizer · merge sync ================= */
+LOCAL_KEYS.push('xpPrev');
+
+/* ---------- three-way merge (used by Sync) ---------- */
+const sj=v=>{
+  if(v===undefined)return 'u';
+  if(v===null||typeof v!=='object')return JSON.stringify(v);
+  if(Array.isArray(v))return '['+v.map(sj).join(',')+']';
+  return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+sj(v[k])).join(',')+'}';
+};
+const isObj=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
+const ADD_RE=/^(xp|xpDay\.[^.]+|pomo\.done\.[^.]+)$/;
+const SET_RE=/^(alerts|spend|prLog|focus\.log|focus\.broken|shield\.used)$/;
+/* b = last synced copy, l = this device, r = the cloud. Whatever only one side changed is kept; if both changed
+   the same thing, lists are combined, counters are added, and otherwise the newer device wins. */
+function m3(b,l,r,ln,p){
+  if(sj(l)===sj(r))return l;
+  if(sj(b)===sj(l))return r;
+  if(sj(b)===sj(r))return l;
+  if(ADD_RE.test(p)&&typeof l==='number'&&typeof r==='number'){const bb=typeof b==='number'?b:0;return Math.max(0,bb+(l-bb)+(r-bb))}
+  if(isObj(l)&&isObj(r)){
+    const o={},bo=isObj(b)?b:{};
+    for(const k of new Set([...Object.keys(l),...Object.keys(r)])){const v=m3(bo[k],l[k],r[k],ln,p?p+'.'+k:k);if(v!==undefined)o[k]=v}
+    return o;
+  }
+  if(Array.isArray(l)&&Array.isArray(r)){
+    const idk=x=>isObj(x)?(x.id!=null?'i'+x.id:(/^lifts\./.test(p)&&x.d!=null?'d'+x.d:null)):null;
+    const all=l.concat(r);
+    if((all.length&&all.every(x=>idk(x)!==null))||SET_RE.test(p)){
+      const key=x=>idk(x)||('j'+sj(x)),bl=Array.isArray(b)?b:[];
+      const mk=a=>{const m=new Map();a.forEach(x=>m.set(key(x),x));return m};
+      const ml=mk(l),mr=mk(r),mb=mk(bl),out=[];
+      for(const k of new Set([...ml.keys(),...mr.keys()])){
+        const il=ml.has(k),ir=mr.has(k),ib=mb.has(k);
+        if(il&&ir)out.push(m3(mb.get(k),ml.get(k),mr.get(k),ln,p+'[]'));
+        else if(il&&!ib)out.push(ml.get(k));
+        else if(ir&&!ib)out.push(mr.get(k));
+      }
+      if(/^lifts\./.test(p))out.sort((a,c)=>a.d<c.d?-1:a.d>c.d?1:0);
+      return out;
+    }
+  }
+  return ln?l:r;
+}
+
+/* ---------- daily XP (for the heatmap tooltip) ---------- */
+function xpTrack(){
+  try{
+    if(!S||typeof S.xp!=='number')return;
+    if(!S.xpDay)S.xpDay={};
+    if(typeof S.xpPrev!=='number'){S.xpPrev=S.xp;return}
+    const d=S.xp-S.xpPrev;
+    if(d>0){const k=iso(new Date());S.xpDay[k]=(S.xpDay[k]||0)+d}
+    S.xpPrev=S.xp;
+  }catch(e){}
+}
+function dayXp(k){
+  if(S.xpDay&&S.xpDay[k]!=null)return S.xpDay[k];
+  const n=iso(addDays(new Date(k+'T00:00:00'),1));
+  if(S.xpOpen&&S.xpOpen[k]!=null&&S.xpOpen[n]!=null)return Math.max(0,S.xpOpen[n]-S.xpOpen[k]);
+  return null;
+}
+
+/* ---------- 90-day heatmap ---------- */
+function heatCard(){
+  const today=sod(new Date()),N=90,start=addDays(today,-(N-1)),lead=start.getDay();
+  let cells='',hit=0,sum=0,cnt=0,months='';
+  for(let i=0;i<lead;i++)cells+='<i class="hz"></i>';
+  const cols=Math.ceil((lead+N)/7);
+  const mcol={};
+  for(let i=0;i<N;i++){
+    const d=addDays(start,i),k=iso(d),p=S.hist[k]||0,t=p>=80?3:p>=50?2:p>0?1:0,col=Math.floor((lead+i)/7);
+    if(p>0){cnt++;sum+=p}if(p>=80)hit++;
+    if(!(col in mcol))mcol[col]=d;
+    cells+=`<button class="hc h${t}${k===iso(today)?' td':''}" data-hd="${k}" aria-label="${k}: ${p}%"></button>`;
+  }
+  let last=-1;
+  for(let c=0;c<cols;c++){const d=mcol[c];const m=d?d.getMonth():-1;months+=`<span>${d&&m!==last?d.toLocaleDateString(undefined,{month:'short'}):''}</span>`;if(d)last=m}
+  return `<section class="card heat"><div class="eyebrow">Consistency · last 90 days</div>
+   <div class="hwrap" id="hwrap"><div class="hmo" style="grid-template-columns:repeat(${cols},1fr)">${months}</div>
+   <div class="hgrid" style="grid-template-columns:repeat(${cols},1fr)">${cells}</div><div class="htip" id="htip" hidden></div></div>
+   <div class="hleg"><span>Less</span><i class="hc h0"></i><i class="hc h1"></i><i class="hc h2"></i><i class="hc h3"></i><span>More</span></div>
+   <p class="sm mu" style="margin-top:10px">${hit} day${hit===1?'':'s'} at 80%+${cnt?` · ${Math.round(sum/cnt)}% average on active days`:''}. Tap a square for details.</p></section>`;
+}
+function heatTip(k){
+  const g=$('#hwrap');if(!g)return;
+  $$('.hc.sel',g).forEach(x=>x.classList.remove('sel'));
+  const b=$(`[data-hd="${k}"]`,g),tip=$('#htip');if(!b||!tip)return;
+  if(!tip.hidden&&tip.dataset.k===k){tip.hidden=true;return}
+  b.classList.add('sel');
+  const p=S.hist[k]||0,xp=dayXp(k),d=new Date(k+'T00:00:00');
+  tip.innerHTML=`<b>${d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</b><span>${p}% complete</span><span>${xp==null?'XP not recorded':'+'+xp+' XP'}</span>`;
+  tip.dataset.k=k;tip.hidden=false;
+  const gr=g.getBoundingClientRect(),br=b.getBoundingClientRect(),w=tip.offsetWidth;
+  let x=br.left-gr.left+br.width/2-w/2;x=Math.max(0,Math.min(gr.width-w,x));
+  tip.style.left=x+'px';tip.style.top=(br.top-gr.top-tip.offsetHeight-8)+'px';
+}
+
+/* ---------- sleep cutoff · wind-down · night mode · Lights Out ---------- */
+const WIND_LEAD=20,WAKE_M=5*60,LO_GRACE=60;
+const moonSvg='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+const Sleep={last:'',dis:'',force:'',
+  cut(){const m=/^(\d{1,2}):(\d{2})$/.exec((S.sleep&&S.sleep.cutoff)||'22:20');return m?(+m[1])*60+(+m[2]):22*60+20},
+  nowM(){const n=new Date();return n.getHours()*60+n.getMinutes()},
+  phase(){
+    if(this.force)return this.force;
+    if(!S.sleep||S.sleep.on===false)return 'day';
+    const c=this.cut(),n=this.nowM();
+    if(n>=c||n<WAKE_M)return 'night';
+    if(n>=c-WIND_LEAD)return 'wind';
+    return 'day';
+  },
+  key(){const d=new Date();if(this.nowM()<WAKE_M)d.setDate(d.getDate()-1);return iso(d)},
+  entry(){return S.sleep.log[this.key()]},
+  streak(){
+    let d=sod(new Date(this.key()+'T00:00:00')),n=0;
+    if(!(S.sleep.log[iso(d)]&&S.sleep.log[iso(d)].ok))d=addDays(d,-1);
+    while(S.sleep.log[iso(d)]&&S.sleep.log[iso(d)].ok){n++;d=addDays(d,-1)}
+    const ks=Object.keys(S.sleep.log).filter(k=>S.sleep.log[k].ok).sort();let best=0,run=0,pv=null;
+    ks.forEach(k=>{const dd=new Date(k+'T00:00:00');run=pv&&Math.round((dd-pv)/864e5)===1?run+1:1;pv=dd;best=Math.max(best,run)});
+    return {cur:n,best:Math.max(best,n)};
+  },
+  minsLeft(){return Math.max(0,this.cut()-this.nowM())},
+  paint(){
+    const ph=this.phase(),h=document.documentElement;
+    if(ph==='night')h.dataset.night='1';else delete h.dataset.night;
+    const m=document.querySelector('meta[name=theme-color]');
+    if(m){if(!this._tc)this._tc=m.content;m.content=ph==='night'?'#0c0303':this._tc}
+  },
+  tick(force){
+    const ph=this.phase();
+    if(ph!==this.last||force){
+      const was=this.last;this.last=ph;this.paint();
+      const a=document.activeElement;
+      if(cur==='day'&&was!==''&&!(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)))render(true);
+    }else if(ph==='wind'){const e=$('[data-wdm]');if(e)e.textContent=this.minsLeft()}
+    if(ph==='night')this.prompt();else this.closePrompt();
+  },
+  banner(){
+    if(!S.sleep||S.sleep.on===false||!isToday(vd))return '';
+    const ph=this.phase(),en=this.entry();
+    if(ph==='wind')return `<section class="card wd"><span class="wdi">${moonSvg}</span><div class="grow"><b>Wind-down</b><p class="sm mu">Lights out in <span data-wdm>${this.minsLeft()}</span> min. Finish up, dim the screen, no new tasks.</p></div></section>`;
+    if(ph==='night'){
+      if(en)return `<section class="card wd on"><span class="wdi">${moonSvg}</span><div class="grow"><b>Lights out logged ${esc(fmtT(en.t))}</b><p class="sm mu">${en.ok?'Sleep streak: '+this.streak().cur+' night'+(this.streak().cur===1?'':'s'):'Logged late, so it does not count toward the streak.'}</p></div></section>`;
+      return `<section class="card wd on"><span class="wdi">${moonSvg}</span><div class="grow"><b>Time to shut down</b><p class="sm mu">Cutoff was ${esc(fmtT(S.sleep.cutoff))}. Check in to keep your sleep streak.</p></div><button class="btn sm" data-v23="lo">Lights Out</button></section>`;
+    }
+    return '';
+  },
+  prompt(){
+    if(document.getElementById('lo')||this.entry())return;
+    const k=this.key();if(this.dis===k)return;
+    const d=(this.nowM()-this.cut()+1440)%1440;if(d>120)return;
+    if(Modal.isOpen()||(typeof Flock!=='undefined'&&Flock.open))return;
+    const el=document.createElement('div');el.id='lo';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
+    const st=this.streak();
+    el.innerHTML=`<div class="lo-c"><div class="lo-m">${moonSvg}</div><h2>Lights Out</h2><p>It is ${esc(fmtT(S.sleep.cutoff))}. Shut it down and protect tomorrow.</p><p class="lo-s">Sleep streak: <b>${st.cur}</b> night${st.cur===1?'':'s'} · best ${st.best}</p><button class="btn" data-v23="lo" style="width:100%;height:54px;font-size:17px">Lights Out</button><button class="lo-n" data-v23="lonot">Not now</button></div>`;
+    document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add('in'));
+  },
+  closePrompt(){const e=document.getElementById('lo');if(e){e.classList.remove('in');setTimeout(()=>e.remove(),300)}},
+  log(){
+    if(this.entry())return;
+    const n=this.nowM(),d=(n-this.cut()+1440)%1440,ok=d<=LO_GRACE;
+    S.sleep.log[this.key()]={ok,t:pad(Math.floor(n/60))+':'+pad(n%60)};
+    this.closePrompt();Sfx.play('done');buzz('strong');
+    toast(ok?'Lights out. Sleep streak '+this.streak().cur:'Logged, but late for the streak');
+    save();sync();render(true);
+  },
+  start(){this.tick(true);setInterval(()=>this.tick(),15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)this.tick()})}
+};
+function sleepCard(){
+  const st=Sleep.streak(),dots=[];
+  for(let i=13;i>=0;i--){const d=iso(addDays(new Date(Sleep.key()+'T00:00:00'),-i)),e=S.sleep.log[d];dots.push(`<i class="sd ${e?(e.ok?'ok':'late'):''}" title="${d}${e?' '+e.t:''}"></i>`)}
+  return `<section class="card"><div class="eyebrow">Sleep discipline</div>
+  <div class="grid2" style="margin-top:10px"><div class="tile"><small>Streak</small><div class="big">${st.cur}</div></div><div class="tile"><small>Best</small><div class="big">${st.best}</div></div></div>
+  <div class="sdots">${dots.join('')}</div><p class="sm mu" style="margin-top:8px">Lights Out within an hour of your ${esc(fmtT(S.sleep.cutoff))} cutoff counts. Last 14 nights.</p></section>`;
+}
+function sleepSettings(){
+  const on=S.sleep.on!==false;
+  return `<section class="card"><div class="eyebrow" style="margin-bottom:10px">Sleep cutoff</div>
+  <div class="setrow"><div><b>Automatic wind-down</b><div class="sm mu" style="margin-top:4px">Banner ${WIND_LEAD} min before, night colors and a Lights Out check-in at the cutoff.</div></div><button class="sw ${on?'on':''}" role="switch" aria-checked="${on}" aria-label="Automatic wind-down" data-v23="sleepon"><i></i></button></div>
+  <div class="setrow" style="margin-top:14px"><div><b>Cutoff time</b><div class="sm mu" style="margin-top:4px">Default 10:20 PM</div></div><input type="time" data-v23="cut" value="${esc(S.sleep.cutoff)}" style="width:auto"></div>
+  <div class="row2" style="margin-top:14px"><button class="btn sm ghost" data-v23="prev">Preview night mode</button></div></section>`;
+}
+document.addEventListener('click',e=>{
+  const h=e.target.closest&&e.target.closest('[data-hd]');
+  if(h){heatTip(h.dataset.hd);return}
+  const t=e.target.closest&&e.target.closest('[data-v23]');if(!t)return;
+  const a=t.dataset.v23;
+  if(a==='lo'){Sleep.log()}
+  else if(a==='lonot'){Sleep.dis=Sleep.key();Sleep.closePrompt()}
+  else if(a==='sleepon'){S.sleep.on=!(S.sleep.on!==false);save();sync();Sleep.tick(true);render(true)}
+  else if(a==='prev'){Sleep.force=Sleep.force?'':'night';Sleep.tick(true);toast(Sleep.force?'Night mode preview on':'Night mode preview off');t.textContent=Sleep.force?'Stop preview':'Preview night mode'}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;if(t&&t.dataset&&t.dataset.v23==='cut'&&/^\d{2}:\d{2}$/.test(t.value)){S.sleep.cutoff=t.value;Sleep.dis='';save();sync();Sleep.tick(true);toast('Cutoff set to '+fmtT(t.value))}
+});
+document.addEventListener('click',e=>{const g=$('#hwrap');if(g&&!e.target.closest('#hwrap')){const t=$('#htip');if(t)t.hidden=true;$$('.hc.sel',g).forEach(x=>x.classList.remove('sel'))}});
 
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
@@ -1876,7 +2127,7 @@ function logLift(t){
   arr.sort((a,b)=>a.d<b.d?-1:1);
   if(!prev||score>prev.e1)S.prs[key]={kg,reps,e1:score,d:k};
   if(isPr&&!(ex&&ex.pr)){
-    S.xp+=PR_XP;S.prLog.push({d:k,key,kg,reps});Sfx.play('done');buzz();toast('NEW PR! +'+PR_XP+' XP');
+    S.xp+=PR_XP;S.prLog.push({d:k,key,kg,reps});Sfx.play('done');buzz();toast('NEW PR! +'+PR_XP+' XP');Viz.flash();
   }else{Sfx.play('on');toast('Logged '+liftTxt(entry))}
   save();sync();render(true);
 }
@@ -2722,8 +2973,8 @@ const Viz={raf:0,an:null,tapped:new Set(),buf:null,t0:performance.now(),N:480,
   soon(){setTimeout(()=>{if(!$('#app').classList.contains('open')){cancelAnimationFrame(this.raf);this.raf=0}},500)},
   HUES:[[0,180],[50,115],[95,58],[125,24],[160,140],[200,186],[250,232],[300,286],[335,262],[360,180]],
   hue(deg){const H=this.HUES;for(let i=1;i<H.length;i++)if(deg<=H[i][0]){const a=H[i-1],b=H[i],k=(deg-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*k}return 180},
-  boost:0,pulse(){const t=(performance.now()-this.t0)/1000;this.rip.push({t0:t});this.boost=1;if(!this.raf&&$('#app').classList.contains('open'))this.start()},PK:[],HS:null,last:0,rip:[],lastKick:-1,q:2,ema:6,skip:0,HT:null,
-  hueTable(){if(!this.HT){this.HT=new Array(360);for(let d=0;d<360;d++)this.HT[d]=this.hue(d)}return this.HT},
+  fl:[],fm(){if(Pomo.running)return Pomo.mode==='focus'?'focus':'rest';return Snd.cur?'amb':null},flash(){const t=(performance.now()-this.t0)/1000;this.fl.push({t0:t,h:document.documentElement.dataset.night?15:165});this.boost=1;if(!this.raf&&$('#app').classList.contains('open'))this.start();let f=document.getElementById('fxflash');if(!f){f=document.createElement('div');f.id='fxflash';document.body.appendChild(f)}f.style.setProperty('--fx',document.documentElement.dataset.night?'#f59e0b':'#2dffb4');f.classList.remove('go');void f.offsetWidth;f.classList.add('go')},boost:0,pulse(){const t=(performance.now()-this.t0)/1000;this.rip.push({t0:t});this.boost=1;if(!this.raf&&$('#app').classList.contains('open'))this.start()},PK:[],HS:null,last:0,rip:[],lastKick:-1,q:2,ema:6,skip:0,HT:null,
+  hueTable(){const n=document.documentElement.dataset.night?1:0;if(!this.HT||this.HN!==n){this.HN=n;this.HT=new Array(360);for(let d=0;d<360;d++)this.HT[d]=n?(350+d/360*55)%360:this.hue(d)}return this.HT},
   draw(){
     const cv=$('#viz');if(!cv)return;
     /* size the bitmap to what the screen can actually show, so phones do less work */
@@ -2736,16 +2987,21 @@ const Viz={raf:0,an:null,tapped:new Set(),buf:null,t0:performance.now(),N:480,
     if(this.an){this.tap();this.an.getByteFrequencyData(this.buf);for(let i=0;i<this.buf.length;i++)if(this.buf[i]>6){live=true;break}}
     const TAU=Math.PI*2,hash=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
     /* a built-in groove (124 bpm) keeps it dancing; real sound from the app takes over when it plays */
-    const bpm=124,beat=t*bpm/60,ph=beat%1,bar=Math.floor(beat),kick=Math.exp(-ph*5.5)*(bar%4===3?.7:1),snare=(bar%2===1)?Math.exp(-((beat%1)*7)):0,hat=Math.exp(-(((beat*2)%1))*10)*.5;
+    const FM=Viz.fm(),bpm=FM==='focus'?54:FM==='rest'?42:FM==='amb'?68:124,beat=t*bpm/60,ph=beat%1,bar=Math.floor(beat),kick=Math.exp(-ph*5.5)*(bar%4===3?.7:1),snare=(bar%2===1)?Math.exp(-((beat%1)*7)):0,hat=Math.exp(-(((beat*2)%1))*10)*.5;
     let bass=0,mid=0,hi=0;
     if(live){let a=0,b=0,d=0;for(let i=1;i<6;i++)a+=this.buf[i];for(let i=6;i<30;i++)b+=this.buf[i];for(let i=30;i<70;i++)d+=this.buf[i];bass=a/5/255;mid=b/24/255;hi=d/40/255}
-    const K0=(live?bass*1.15:kick)+this.boost*.85,S0=(live?mid*1.2:snare*.8)+this.boost*.4,H0=(live?hi*1.5:hat)+this.boost*.3;
+    let K0=(live?bass*1.15:kick)+this.boost*.85,S0=(live?mid*1.2:snare*.8)+this.boost*.4,H0=(live?hi*1.5:hat)+this.boost*.3;
+    if(FM){/* focus rhythm: a steady, calm heartbeat; the sound generator only adds a little texture */
+      const sc=FM==='focus'?1:FM==='rest'?.55:.8,st=Math.exp(-ph*4);
+      K0=(.58*st+(FM==='amb'?.2+.15*Math.sin(t*1.1):0)+(live?bass*.3:0))*sc+this.boost*.85;
+      S0=(.18+.12*Math.sin(t*2.2)+(live?mid*.3:0))*sc+this.boost*.4;
+      H0=(.15+(live?hi*.35:0))*sc+this.boost*.3}
     if(this.lastKick!==bar&&K0>.55&&ph<.1){this.lastKick=bar;this.rip.push({t0:t})}
     this.rip=this.rip.filter(r=>t-r.t0<1.1);
     const K=26;
     if(this.PK.length!==K)this.PK=Array.from({length:K},(_,k)=>({c:k/K*TAU+(hash(k)-.5)*.2,w:.06+hash(k+3)*.1,ph:hash(k+7)*TAU,sp:1.2+hash(k+11)*3.2,hh:.55+hash(k+5)*.45,band:hash(k+17)}));
     if(!this.HS||this.HS.length!==N)this.HS=new Float32Array(N);
-    const drift=t*.06,tgt=new Float32Array(N);
+    const drift=t*(FM?.03:.06),tgt=new Float32Array(N);
     for(let i=0;i<N;i++){
       const th=i/N*TAU;let e=.05+.05*Math.sin(th*37+t*5);
       for(const p of this.PK){
@@ -2760,7 +3016,7 @@ const Viz={raf:0,an:null,tapped:new Set(),buf:null,t0:performance.now(),N:480,
     }
     for(let i=0;i<N;i++){const d=tgt[i]-this.HS[i];this.HS[i]+=d*(d>0?Math.min(1,dt*30):Math.min(1,dt*7))}
     /* everything has to fit inside the square: ring + tallest spike stays under 49% of the width */
-    const pulse=1+.012*K0,r0=W*.325*pulse,L=W*.155,u=W/704;
+    const pulse=1+.012*K0,r0=W*.325*pulse,L=W*.155*(FM==='focus'?.8:FM==='rest'?.62:FM==='amb'?.9:1),u=W/704;
     const HT=this.hueTable(),off=t*9,hue=i=>HT[((Math.floor(i/N*360+off))%360+360)%360];
     g.clearRect(0,0,W,W);g.lineCap='round';g.globalCompositeOperation='lighter';
     const gl=g.createRadialGradient(c,c,r0*.9,c,c,r0*1.5);gl.addColorStop(0,`rgba(120,90,255,${.05+.08*K0})`);gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(0,0,W,W);
@@ -2789,6 +3045,10 @@ const Viz={raf:0,an:null,tapped:new Set(),buf:null,t0:performance.now(),N:480,
       g.strokeStyle=`hsla(${h},100%,70%,${.3+.2*fl})`;g.lineWidth=u*7;g.beginPath();g.arc(c,c,r0,a0,a1);g.stroke();
       g.strokeStyle=`hsla(${h},100%,${88+fl*8}%,1)`;g.lineWidth=u*(3+1.4*fl);g.beginPath();g.arc(c,c,r0,a0,a1);g.stroke();
     }
+    this.fl=this.fl.filter(f=>t-f.t0<1.4);
+    for(const f of this.fl){const k=(t-f.t0)/1.4,e=1-k;
+      g.fillStyle=`hsla(${f.h},100%,60%,${.16*e*e})`;g.fillRect(0,0,W,W);
+      for(let j=0;j<3;j++){const kk=k-j*.12;if(kk<=0)continue;g.strokeStyle=`hsla(${(f.h+j*40)%360},100%,${68+j*6}%,${.75*(1-kk)})`;g.lineWidth=u*(6-j*1.4)*(1-kk*.5)+u;g.beginPath();g.arc(c,c,r0*.6+W*.7*kk,0,TAU);g.stroke()}}
     g.globalCompositeOperation='source-over';
     /* watch the frame cost and step down quality if the device is struggling */
     const cost=performance.now()-t0;this.ema=this.ema*.9+cost*.1;
@@ -3033,7 +3293,7 @@ const Pomo={lock:false,ambOn:false,mode:'focus',running:false,end:0,left:null,iv
     const was=this.mode,wasLock=this.lock;let next='focus';
     if(!skipped){beep();buzz()}
     if(was==='focus'){
-      if(!skipped){const gain=wasLock?45:30;S.xp+=gain;const k=iso(new Date());S.pomo.done[k]=(S.pomo.done[k]||0)+1;S.pomo.cycle=(S.pomo.cycle||0)+1;S.focus.log.push({d:k,min:Math.round(S.pomo.focus||25),lock:!!wasLock});toast('Focus session done: +'+gain+' XP'+(wasLock?' (1.5x Focus Lock)':''))}
+      if(!skipped){const gain=wasLock?45:30;S.xp+=gain;const k=iso(new Date());S.pomo.done[k]=(S.pomo.done[k]||0)+1;S.pomo.cycle=(S.pomo.cycle||0)+1;S.focus.log.push({d:k,min:Math.round(S.pomo.focus||25),lock:!!wasLock});Viz.flash();toast('Focus session done: +'+gain+' XP'+(wasLock?' (1.5x Focus Lock)':''))}
       if(S.pomo.cycle>=S.pomo.every){next='long';S.pomo.cycle=0}else next='short';
       this.lock=false;
     }
@@ -4017,6 +4277,7 @@ const Sync={cfgFile:null,cfgSaved:null,room:'',status:'off',msg:'',lastJ:'',appl
     const w=window.FIREBASE_CONFIG;
     this.cfgFile=(w&&w.apiKey&&w.projectId)?{apiKey:w.apiKey,projectId:w.projectId}:null;
     this.lastJ=syncJSON(persistable());
+    try{const b=JSON.parse(localStorage.getItem('cl_syncbase')||'null');if(b&&b.room===this.room){this.bs=b.base;this.pu=b.pu||0;this.ru=b.ru||''}}catch(e){}
     if(this.ready())this.start();
     else this.set('off',this.conf?'Enter a sync code to connect this device.':'Add your Firebase keys to turn sync on.');
   },
@@ -4037,26 +4298,36 @@ const Sync={cfgFile:null,cfgSaved:null,room:'',status:'off',msg:'',lastJ:'',appl
     const r=await fetch(this.base()+'?key='+encodeURIComponent(this.conf.apiKey));
     if(r.status===404)return {none:true};
     if(!r.ok){const e=new Error('http '+r.status);e.status=r.status;throw e}
-    const f=(await r.json()).fields||{};
-    return {u:+((f.u||{}).integerValue||0),data:(f.data||{}).stringValue||''};
+    const doc=await r.json(),f=doc.fields||{};
+    return {u:+((f.u||{}).integerValue||0),data:(f.data||{}).stringValue||'',ut:doc.updateTime||''};
   },
-  async put(){
+  async put(pre,none){
     if(!S._u){S._u=Date.now();try{localStorage.setItem(KEY,JSON.stringify(persistable()))}catch(e){}}
     const st=persistable();LOCAL_KEYS.forEach(k=>delete st[k]);delete st._u;
-    const data=JSON.stringify(st);
+    const data=JSON.stringify(st),snapU=S._u;
     if(data.length>900000){const e=new Error('too big');e.status='big';throw e}
-    const r=await fetch(this.base()+'?key='+encodeURIComponent(this.conf.apiKey)+'&updateMask.fieldPaths=u&updateMask.fieldPaths=data',
-      {method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:{u:{integerValue:String(S._u)},data:{stringValue:data}}})});
-    if(!r.ok){const e=new Error('http '+r.status);e.status=r.status;throw e}
+    const r=await fetch(this.base()+'?key='+encodeURIComponent(this.conf.apiKey)+'&updateMask.fieldPaths=u&updateMask.fieldPaths=data'+(none?'&currentDocument.exists=false':pre?'&currentDocument.updateTime='+encodeURIComponent(pre):''),
+      {method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:{u:{integerValue:String(snapU)},data:{stringValue:data}}})});
+    if(!r.ok){let t='';try{t=await r.text()}catch(x){}const e=new Error('http '+r.status);e.status=(r.status===409||r.status===412||/FAILED_PRECONDITION|ALREADY_EXISTS/.test(t))?'race':r.status;throw e}
+    let ut='';try{ut=(await r.json()).updateTime||''}catch(x){}
+    this.done(data,snapU,ut);
   },
-  apply(r){
-    let rd;try{rd=JSON.parse(r.data)}catch(e){return}
+  done(js,u,ut){
+    try{this.bs=JSON.parse(js)}catch(e){this.bs=null}
+    this.pu=u;this.ru=ut;
+    try{localStorage.setItem('cl_syncbase',JSON.stringify({room:this.room,base:this.bs,pu:u,ru:ut}))}catch(e){try{localStorage.removeItem('cl_syncbase')}catch(x){}}
+  },
+  apply(r){this.adopt(r.data,r.u,r.ut,true)},
+  adopt(js,u,ut,synced){
+    let rd;try{rd=JSON.parse(js)}catch(e){return}
     const keep={};
     sessionOnly.forEach(sec=>(SESS[sec]||[]).forEach(k=>{keep[k]=S[k]}));
     this.applying=true;
-    S=Object.assign(defaults(),rd,keep);fixup();S._u=r.u;
+    S=Object.assign(defaults(),rd,keep);fixup();S._u=u;S.xpPrev=S.xp;
     this.lastJ=syncJSON(persistable());this.applying=false;
     try{localStorage.setItem(KEY,JSON.stringify(persistable()))}catch(e){}
+    if(synced)this.done(js,u,ut);
+    try{Sleep.tick(true)}catch(e){}
     const a=document.activeElement;
     if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))this.needRender=true;else render(true);
   },
@@ -4067,15 +4338,30 @@ const Sync={cfgFile:null,cfgSaved:null,room:'',status:'off',msg:'',lastJ:'',appl
   async run(){
     if(!this.ready())return;
     if(this.busy){this.again=true;return}
-    this.busy=true;
+    this.busy=true;let race=false;
     try{
       this.set('busy','Checking for changes…');
-      const r=await this.get(),lu=S._u||0;
-      if(r.none||r.u<lu)await this.put();
-      else if(r.u>lu&&r.data)this.apply(r);
+      const r=await this.get();
+      if(r.none)await this.put('',true);
+      else{
+        const dirty=(S._u||0)>(this.pu||0),changed=r.ut?r.ut!==this.ru:r.u!==(this.pu||0);
+        let need=dirty;
+        if(changed&&r.data){
+          if(!dirty)this.adopt(r.data,r.u,r.ut,true);
+          else{
+            let rem;try{rem=JSON.parse(r.data)}catch(e){rem=null}
+            if(rem){
+              const loc=JSON.parse(syncJSON(persistable())),merged=m3(this.bs||{},loc,rem,(S._u||0)>=r.u,'');
+              if(sj(merged)===sj(rem)){this.adopt(r.data,r.u,r.ut,true);need=false}
+              else{this.adopt(JSON.stringify(merged),Date.now(),'',false);need=true}
+            }
+          }
+        }
+        if(need)await this.put(r.ut,false);
+      }
       const n=new Date();this.set('ok','Last synced at '+fmtT(pad(n.getHours())+':'+pad(n.getMinutes())));Blobs.sync();
-    }catch(e){this.fail(e)}
-    finally{this.busy=false;if(this.again){this.again=false;setTimeout(()=>this.run(),150)}}
+    }catch(e){if(e&&e.status==='race')race=true;else this.fail(e)}
+    finally{this.busy=false;if(this.again||race){this.again=false;setTimeout(()=>this.run(),race?400:150)}}
   }
 };
 function parseFirebaseConfig(t){
@@ -4166,7 +4452,7 @@ const start=(location.hash||'').replace('#','');
 cur=VIEWS[start]?start:'day';
 Sync.init();
 shieldCheck();pushWidget();render();
-Guard.init();Updater.start();
+Guard.init();Updater.start();Sleep.start();
 try{const A=Guard.app();if(A)A.addListener('appStateChange',s=>{if(!s.isActive)Diary.lock()})}catch(e){}
 Notif.check();Notif.plan();
 setInterval(()=>Notif.check(),15000);
@@ -4176,7 +4462,7 @@ document.addEventListener('focusout',()=>{if(Sync.needRender)setTimeout(()=>{con
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)&&!window.__STANDALONE__){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
-window.__dayforge={get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
+window.__dayforge={Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
   setDate(d){vd=sod(d);follow=false;render(true)}};
 })();
 </script>
