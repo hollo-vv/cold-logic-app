@@ -1703,7 +1703,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611230746',WEB_URL='https://benevolent-gumption-81dafb.netlify.app/',APK_URL='https://github.com/hollo-vv/cold-logic-app/actions';
+const APP_VER='202611231242',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/actions';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -3174,10 +3174,10 @@ const SoundLab={
   /* distant crowd: several unintelligible voices (buzzy source through moving vowel resonances), room tone underneath */
   cafe(sr,done){
     const F=Math.floor(sr*.8),N=sr*12+F,V=[[730,1090,2440],[530,1840,2480],[270,2290,3010],[570,840,2410],[300,870,2240],[660,1720,2410]];
-    const L=new Float64Array(N),R=new Float64Array(N),voices=9;let v=0;
+    const L=new Float64Array(N),R=new Float64Array(N),voices=16;let v=0;
     const bp=(f,q)=>{const w=6.2832*f/sr,al=Math.sin(w)/(2*q),a0=1+al;return [al/a0,0,-al/a0,-2*Math.cos(w)/a0,(1-al)/a0]};
     const one=()=>{
-      const f0=Math.random()<.5?this.rnd(95,135):this.rnd(170,250),pan=Math.random(),lvl=this.rnd(.5,1),segs=[],env=new Float32Array(N);
+      const f0=Math.random()<.5?this.rnd(95,135):this.rnd(170,250),pan=Math.random(),lvl=this.rnd(.25,1),segs=[],env=new Float32Array(N);
       for(let i=Math.floor(Math.random()*sr*.6);i<N;){
         for(let n=this.rnd(3,9)|0;n>0&&i<N;n--){
           const d=Math.floor(this.rnd(.1,.26)*sr),vw=V[Math.random()*V.length|0],a=this.rnd(.45,1);
@@ -3196,8 +3196,8 @@ const SoundLab={
           co[0]=bp(fr[0],6);co[1]=bp(fr[1],8);co[2]=bp(fr[2],10);
         }
         if(env[i]<.002)continue;
-        ph+=f0*(1+.05*Math.sin(6.2832*3.1*i/sr)+.01*(Math.random()-.5))/sr;if(ph>=1)ph-=1;
-        const s=(ph*2-1)+.35*(Math.random()*2-1);let y=0;
+        ph+=f0*(1+.05*Math.sin(6.2832*3.1*i/sr)+.1*Math.sin(6.2832*.6*i/sr+f0)+.01*(Math.random()-.5))/sr;if(ph>=1)ph-=1;
+        const s=.55*(ph*2-1)+.75*(Math.random()*2-1);let y=0;
         for(let j=0;j<3;j++){const c=co[j],z=st[j],o=c[0]*s+z[0];z[0]=z[1]+c[1]*s-c[3]*o;z[1]=c[2]*s-c[4]*o;y+=o*[1,.7,.4][j]}
         y*=env[i]*lvl;L[i]+=y*(1-pan*.85);R[i]+=y*(.15+pan*.85);
       }
@@ -3207,14 +3207,14 @@ const SoundLab={
       const room=this.norm(this.noise(1<<16,sr,f=>this.hp(f,80,2)*this.lp(f,1400,2)/Math.sqrt(Math.max(f,100)/100)),1);
       const a=this.loopify(L,F),b=this.loopify(R,F);
       this.norm(a,.1);this.norm(b,.1);
-      for(let i=0;i<a.length;i++){const r=room[i%room.length]*.035;a[i]+=r;b[i]+=room[(i+777)%room.length]*.035}
+      for(let i=0;i<a.length;i++){const r=room[i%room.length]*.055;a[i]+=r;b[i]+=room[(i+777)%room.length]*.055}
       done([a,b]);
     };
     step();
   }
 };
 const Snd={cur:null,nodes:[],timers:[],master:null,cache:{},
-  SR:{white:44100,brown:44100,gray:44100,rain:32000,forest:32000,cafe:16000},
+  SR:{white:44100,brown:44100,gray:44100,rain:32000,forest:32000,cafe:22050},
   gain(v){const g=ac().createGain();g.gain.value=v;this.nodes.push(g);return g},
   pan(p){const c=AC;if(!c.createStereoPanner)return this.gain(1);const n=c.createStereoPanner();n.pan.value=p;this.nodes.push(n);return n},
   /* returns (through cb) an AudioBuffer for the sound, building it the first time */
@@ -4452,7 +4452,21 @@ const start=(location.hash||'').replace('#','');
 cur=VIEWS[start]?start:'day';
 Sync.init();
 shieldCheck();pushWidget();render();
-Guard.init();Updater.start();Sleep.start();
+Snd.clink=function(){
+    const c=AC,t0=c.currentTime+.02,out=this.out(Math.random()*1.8-.9,.3+Math.random()*.5),hits=1+(Math.random()*3|0);
+    for(let h=0;h<hits;h++){
+      const t=t0+h*(.05+Math.random()*.12),f=2800+Math.random()*2400,n=Math.floor(c.sampleRate*.05),nb=c.createBuffer(1,n,c.sampleRate),d=nb.getChannelData(0);
+      for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(c.sampleRate*.006));
+      const s=c.createBufferSource(),bp=c.createBiquadFilter(),g=c.createGain();
+      s.buffer=nb;bp.type='bandpass';bp.frequency.value=f;bp.Q.value=2.5;g.gain.value=.25+Math.random()*.25;
+      s.connect(bp).connect(g).connect(out);s.start(t);this.nodes.push(s,bp,g);
+      [[1,.5],[1.47,.35],[2.13,.2]].forEach(([k,a])=>{const o=c.createOscillator(),og=c.createGain(),dd=.025+Math.random()*.05;o.type='sine';o.frequency.value=f*.55*k;
+        og.gain.setValueAtTime(a*.09,t);og.gain.exponentialRampToValueAtTime(.0001,t+dd);o.connect(og).connect(out);o.start(t);o.stop(t+dd+.02)});
+    }
+    if(Math.random()<.4){const t=t0+hits*.1,o=c.createOscillator(),g=c.createGain();o.frequency.setValueAtTime(170,t);o.frequency.exponentialRampToValueAtTime(80,t+.08);
+      g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.06,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(out);o.start(t);o.stop(t+.14)}
+  };
+  Guard.init();Updater.start();Sleep.start();
 try{const A=Guard.app();if(A)A.addListener('appStateChange',s=>{if(!s.isActive)Diary.lock()})}catch(e){}
 Notif.check();Notif.plan();
 setInterval(()=>Notif.check(),15000);
