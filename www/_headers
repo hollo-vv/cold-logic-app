@@ -7,3 +7,6 @@
 /manifest.json
   Cache-Control: no-cache
   Content-Type: application/manifest+json
+/version.json
+  Cache-Control: no-store
+  Access-Control-Allow-Origin: *

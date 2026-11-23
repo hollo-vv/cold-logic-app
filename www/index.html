@@ -864,6 +864,11 @@ button,.nav,.card,.cd,.tick{touch-action:manipulation}
 .rp-w{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;margin-top:6px;border-radius:12px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);font-size:13px}
 .rp-w span{color:var(--mu);text-align:right}
 .rp p{margin:6px 0 0}
+/* update banner */
+#upd{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);max-width:520px;margin:0 auto;z-index:130;display:flex;align-items:center;gap:10px;padding:12px 12px 12px 16px;border-radius:18px;background:linear-gradient(135deg,#1b1b2b,#14141f);border:1px solid var(--acc);box-shadow:0 16px 40px -10px rgba(0,0,0,.8),0 0 24px -6px var(--acc);transform:translateY(140%);transition:transform .45s cubic-bezier(.22,.9,.24,1)}
+#upd.in{transform:none}
+#upd>div{flex:1;display:flex;flex-direction:column;font-size:13px}
+#upd b{font-size:14px}#upd span{color:var(--mu)}
 </style>
 </head>
 <body>
@@ -874,7 +879,7 @@ button,.nav,.card,.cd,.tick{touch-action:manipulation}
     <button id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button>
     <h1 id="title"><button id="ttlBtn" data-x="ttl" aria-haspopup="menu" aria-expanded="false" aria-controls="navpop"><span id="ttlTxt">Day</span><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></h1>
     <div class="tb">
-      <button id="gearBtn" data-go="edit" aria-label="Settings"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7"/></svg></button>
+      <button id="gearBtn" data-go="edit" aria-label="Settings"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <button class="chip streak" id="streakChip" data-go="day" aria-label="Current streak"></button>
       <button class="mini-ring" data-go="day" aria-label="Day progress"><div class="ring mini"><svg viewBox="0 0 120 120"><circle class="rt" cx="60" cy="60" r="52" pathLength="100"/><circle class="rp" cx="60" cy="60" r="52" pathLength="100"/></svg></div></button>
       <button data-go="profile" aria-label="Profile"><img id="avTop" alt="Profile"></button>
@@ -931,13 +936,13 @@ const P={
  plus:'<path d="M12 5v14M5 12h14"/>',
  trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',
  pencil:'<path d="M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3"/>',
- day:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>',
+ day:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/>',
  acad:'<path d="M3 9l9-5 9 5-9 5-9-5zM7 11.5V16c0 1.5 2.2 3 5 3s5-1.5 5-3v-4.5M21 9v6"/>',
  work:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',
  fuel:'<path d="M4 11h16a8 8 0 01-16 0zM9 3.5c0 2 2 2 2 4.5M14 3.5c0 2 2 2 2 4.5"/>',
  exam:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h3"/>',
  edit:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
- gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
  user:'<circle cx="12" cy="8" r="4"/><path d="M4 20.5c1-4 4-6 8-6s7 2 8 6"/>',
  flame:'<path d="M12 3c.8 3.2 5.2 5.3 5.2 10.2a5.2 5.2 0 01-10.4 0c0-2.2 1-3.6 2.3-4.6.1 2 .9 3 1.9 3.2C10.3 8.6 10.5 5.6 12 3z"/>',
  bolt:'<path d="M13 2.5L5.5 14H11l-1 7.5L18.5 10H13l0-7.5z"/>',
@@ -1452,7 +1457,8 @@ function vEdit(){
   let h=`<div class="seg" role="tablist">${tabs.map(([k,n])=>`<button role="tab" class="${etab===k?'on':''}" data-act="etab" data-k="${k}">${n}</button>`).join('')}</div><div class="stagger">${['tt','wk','rt'].includes(etab)?'<p class="sm mu" style="margin:0 2px 2px">This is your weekly template: changes here apply every week. To change just one day, tap the pencil on that day in Day, Academics or Work-out.</p>':''}`;
   if(etab==='gen'){
     const hp=S.haptic,sf=S.sfx,canV=!!navigator.vibrate;
-    h+=`<section class="card"><div class="eyebrow" style="margin-bottom:10px">Diary</div><div class="setrow"><div><b>Diary passcode</b><div class="sm mu" style="margin-top:4px">4-digit code asked every time the diary opens.</div></div><button class="btn sm" data-x="dpass">${ic('lock')}${S.diary.pin?'Change Diary Passcode':'Set Diary Passcode'}</button></div></section>
+    h+=`<section class="card"><div class="eyebrow" style="margin-bottom:10px">App version</div><div class="setrow"><div><b>${APP_VER}</b><div class="sm mu" style="margin-top:4px">The app checks for updates by itself.</div></div><button class="btn sm" data-x="updchk">Check now</button></div></section>
+    <section class="card"><div class="eyebrow" style="margin-bottom:10px">Diary</div><div class="setrow"><div><b>Diary passcode</b><div class="sm mu" style="margin-top:4px">4-digit code asked every time the diary opens.</div></div><button class="btn sm" data-x="dpass">${ic('lock')}${S.diary.pin?'Change Diary Passcode':'Set Diary Passcode'}</button></div></section>
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">Background</div>
      <div class="fld"><label>Applies to</label><select data-f="bgtarget" aria-label="Background target"><option value="all" ${bgTarget==='all'?'selected':''}>All sections</option>${Object.keys(VIEWS).map(k=>`<option value="${k}" ${bgTarget===k?'selected':''}>${esc(VIEWS[k].t)}</option>`).join('')}</select></div>
      <div class="row2" style="margin-top:12px;flex-wrap:wrap"><button class="btn sm" data-act="bg">${ic('paint')}Change background</button><button class="btn sm ghost" data-act="bgdef">Back to default</button></div>
@@ -1642,6 +1648,51 @@ function vProfile(){
    ${reportCard()}
    ${installEvt?`<section class="card row2"><div class="grow"><b>Install the app</b><p class="sm mu">Adds 𝙲𝙾𝙻𝙳 𝙻𝙾𝙶𝙸𝙲 to your home screen or desktop.</p></div><button class="btn" data-act="install">Install</button></section>`:''}</div>`;
 }
+
+/* ================= v22: automatic update detection ================= */
+const APP_VER='202611230254',WEB_URL='https://benevolent-gumption-81dafb.netlify.app/',APK_URL='https://github.com/hollo-vv/cold-logic-app/actions';
+const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
+  isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
+  async check(manual){
+    if(this.busy)return;this.busy=true;
+    try{
+      this.native=this.isNative();
+      const url=(this.native?WEB_URL:'')+'version.json?t='+Date.now();
+      const r=await fetch(url,{cache:'no-store'});
+      if(!r.ok)throw new Error('http '+r.status);
+      const j=await r.json();this.latest=j.v;
+      try{const reg=!this.native&&navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(reg)reg.update().catch(()=>{})}catch(e){}
+      if(j.v&&j.v!==APP_VER){
+        if(!this.native&&!manual&&!sessionStorage.getItem('cl_autoupd')&&performance.now()<15000){
+          sessionStorage.setItem('cl_autoupd','1');location.reload();return;     /* just launched: refresh silently */
+        }
+        this.banner();
+      }else if(manual)toast('You are on the latest version');
+    }catch(e){if(manual)toast('Could not check for updates. Are you online?')}
+    this.busy=false;
+  },
+  banner(){
+    if(this.shown||document.getElementById('upd'))return;this.shown=true;
+    const d=document.createElement('div');d.id='upd';d.setAttribute('role','alert');
+    d.innerHTML=`<div><b>New version available</b><span>${this.native?'Install the new app file to update.':'Reload to get the latest features.'}</span></div><button class="btn sm" id="updGo">${this.native?'Get update':'Update now'}</button><button class="icon-btn" id="updX" aria-label="Later">${ic('close')}</button>`;
+    document.body.appendChild(d);
+    requestAnimationFrame(()=>d.classList.add('in'));
+    $('#updGo').onclick=()=>this.apply();
+    $('#updX').onclick=()=>{d.classList.remove('in');setTimeout(()=>d.remove(),400);this.shown=false;this.snooze=Date.now()+30*60000};
+  },
+  async apply(){
+    if(this.native){try{window.open(APK_URL,'_blank','noopener')}catch(e){location.href=APK_URL}return}
+    try{const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update()}catch(e){}
+    try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.indexOf('coldlogic-sched')<0).map(k=>caches.delete(k)))}catch(e){}
+    flush&&flush();location.reload();
+  },
+  start(){
+    setTimeout(()=>this.check(false),2500);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!(this.snooze>Date.now()))this.check(false)});
+    window.addEventListener('online',()=>this.check(false));
+    this.timer=setInterval(()=>{if(!document.hidden&&!(this.snooze>Date.now()))this.check(false)},15*60000);
+  }
+};
 
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
@@ -2006,6 +2057,7 @@ window.ColdLogicWidget={get:()=>widgetState(),key:'cold_logic_widget_state'};
 function xact21(t,e){
   const a=t.dataset.x,id=t.dataset.id,v=t.dataset.v;
   switch(a){
+    case 'updchk':Updater.check(true);break;
     case 'aldis':{const al=S.alerts[+t.dataset.i];if(al){al.x=1;save();render(true)}break}
     case 'shbuy':buyShield();break;
     case 'llog':logLift(t);break;
@@ -2025,7 +2077,7 @@ function xact21(t,e){
 }
 document.addEventListener('click',e=>{
   const t=e.target.closest&&e.target.closest('[data-x]');if(!t)return;
-  if(!['aldis','shbuy','llog','lfill','flock','flgo','flexit','flamb','report','rpprev','stlog','stdel','stadd'].includes(t.dataset.x))return;
+  if(!['updchk','aldis','shbuy','llog','lfill','flock','flgo','flexit','flamb','report','rpprev','stlog','stdel','stadd'].includes(t.dataset.x))return;
   e.stopImmediatePropagation();Sfx.play('tap');xact21(t,e);
 },false);
 document.addEventListener('input',e=>{
@@ -4114,7 +4166,7 @@ const start=(location.hash||'').replace('#','');
 cur=VIEWS[start]?start:'day';
 Sync.init();
 shieldCheck();pushWidget();render();
-Guard.init();
+Guard.init();Updater.start();
 try{const A=Guard.app();if(A)A.addListener('appStateChange',s=>{if(!s.isActive)Diary.lock()})}catch(e){}
 Notif.check();Notif.plan();
 setInterval(()=>Notif.check(),15000);
