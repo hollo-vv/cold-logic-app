@@ -955,6 +955,17 @@ html[data-tags] .tick[data-st=VOID]{color:#ef4444}
 html[data-tags] .tick[data-st=LOCK]{color:#e3e6eb;text-shadow:0 0 6px rgba(227,230,235,.6)}
 html[data-tags] .tick[data-st=PEND]{color:var(--mu2)}
 html[data-tags] .tick.holding{transform:none;background:rgba(227,230,235,.12)}
+/* v27 */
+.row .when,.row .when b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;letter-spacing:0;font-size:13px}
+.row .when b{font-weight:600}
+.tick.fx::after{display:none}
+.tlh{display:flex;justify-content:flex-end;padding:0 6px 6px}
+.tlpen{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--mu);border:1px solid var(--line2);background:transparent}
+.tlpen svg{width:17px;height:17px}
+.tlpen.on{color:#e3e6eb;border-color:#e3e6eb;background:rgba(227,230,235,.08)}
+.row.fut,.card.ex.fut,.logrow.fut{opacity:.4}
+.fut .del{display:none}
+.hol{width:26px;height:26px;border-radius:50%;border:1.5px solid #6b7280;display:block;justify-self:center}
 </style>
 </head>
 <body>
@@ -1010,7 +1021,7 @@ const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const sod=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x};
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return sod(x)};
 const mins=t=>{if(!t)return null;const [h,m]=t.split(':').map(Number);return h*60+m};
-const fmtT=t=>{if(!t)return'';const [h,m]=t.split(':').map(Number);return ((h%12)||12)+':'+pad(m)+' '+(h<12?'AM':'PM')};
+const fmtT=t=>{if(!t)return'';const [h,m]=t.split(':').map(Number);return pad(h)+':'+pad(m)};
 let uid=0;const newId=p=>p+Date.now().toString(36)+(uid++);
 
 /* ---------- icons ---------- */
@@ -1279,7 +1290,7 @@ function deny(id,msg){
   const b=$('[data-toggle="'+id+'"]');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),400)}
 }
 function toggle(id){
-  const L=lockInfo(vd,id);if(!L)return;if(Hold.gate(id))return;
+  const L=lockInfo(vd,id);if(!L)return;if(Lock.blocked(id))return;if(Hold.gate(id))return;
   const t=L.t,k=iso(vd),m=S.done[k]||(S.done[k]={});
   if(L.checked){
     if(t.kind==='w'){deny(id,'Work-out items stay checked once done');return}
@@ -1308,7 +1319,7 @@ function tween(el,to){
   (function f(t){const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(to-from)*e);if(k<1)requestAnimationFrame(f)})(t0);
 }
 function sync(){
-  Hold.paint();Tags.paint();updateHist(vd);
+  Lock.paint();Hold.paint();Tags.paint();updateHist(vd);
   const s=stats(vd),pct=s.pct;
   $$('[data-task]').forEach(el=>el.classList.toggle('done',!!s.m[el.dataset.task]));
   { const tk=s.tasks,sk=S.skip[iso(vd)]||{};
@@ -1400,7 +1411,7 @@ function rowHtml(it,wd){
       tick=tickBtn(it.kind);attrs=`data-task="${it.kind}"`;
     }else{body=`<b>${esc(it.n)}</b><div class="cl free">Free period</div>`}
   }else{body=`<b>${esc(it.n)}</b>`;tick=tickBtn(it.id);attrs=`data-task="${it.id}"`}
-  const pen=(it.kind==='normal'||it.kind==='workout')?`<button class="pen" data-act="rtedit" data-id="${esc(it.id)}" aria-label="Edit or reschedule ${esc(it.n)}">${ic('pencil')}</button>`:'';
+  const pen=((it.kind==='normal'||it.kind==='workout')&&Lock.penOk(it))?`<button class="pen" data-act="rtedit" data-id="${esc(it.id)}" aria-label="Edit or reschedule ${esc(it.n)}">${ic('pencil')}</button>`:'';
   const swh=(attrs.indexOf('data-task')>=0||attrs.indexOf('data-wrow')>=0)?`<div class="swh r">${ic('check')}Complete</div><div class="swh l">Skip${ic('right')}</div>`:'';
   return `<div class="${cls}" ${attrs} data-s="${sm}" data-e="${em}">${swh}<div class="when">${when}</div><div class="dot"></div><div class="rb"><div class="now-tag">Now</div>${body}${pen}</div>${tick||'<span></span>'}</div>`;
 }
@@ -1425,7 +1436,7 @@ function vDay(){
   if(wd===0){
     h+=`<section class="card empty"><b>Sunday is free</b>No fixed schedule today. Add your own tasks below and tick them off.</section>`;
   }else{
-    if(S.routine.length)h+=`<section class="card tl" style="padding:12px 8px">${routineSorted().map(it=>rowHtml(it,wd)).join('')}</section>`;
+    if(S.routine.length)h+=`<section class="card tl" style="padding:12px 8px">${Lock.mode()==='future'?'':editToggle()}${routineSorted().map(it=>rowHtml(it,wd)).join('')}</section>`;
   }
   const ex=S.extras[k]||[];
   h+=`<section class="card"><div class="eyebrow" style="margin-bottom:10px">${wd===0?'Your tasks':'Extra tasks for this day'}</div>
@@ -1743,7 +1754,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611240400',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611241344',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -1967,7 +1978,7 @@ function sleepSettings(){
   const on=S.sleep.on!==false;
   return `<section class="card"><div class="eyebrow" style="margin-bottom:10px">Sleep cutoff</div>
   <div class="setrow"><div><b>Automatic wind-down</b><div class="sm mu" style="margin-top:4px">Banner ${WIND_LEAD} min before, night colors and a Lights Out check-in at the cutoff.</div></div><button class="sw ${on?'on':''}" role="switch" aria-checked="${on}" aria-label="Automatic wind-down" data-v23="sleepon"><i></i></button></div>
-  <div class="setrow" style="margin-top:14px"><div><b>Cutoff time</b><div class="sm mu" style="margin-top:4px">Default 10:20 PM</div></div><input type="time" data-v23="cut" value="${esc(S.sleep.cutoff)}" style="width:auto"></div>
+  <div class="setrow" style="margin-top:14px"><div><b>Cutoff time</b><div class="sm mu" style="margin-top:4px">Default 22:20</div></div><input type="time" data-v23="cut" value="${esc(S.sleep.cutoff)}" style="width:auto"></div>
   <div class="row2" style="margin-top:14px"><button class="btn sm ghost" data-v23="prev">Preview night mode</button></div></section>`;
 }
 document.addEventListener('click',e=>{
@@ -2015,6 +2026,7 @@ const Hold={go:false,q:false,cur:null,eat:0,aud:null,
   start(el,id,kind,e){
     if(this.cur)return;
     const k=iso(vd);
+    if(kind==='task'?Lock.blocked(id):Lock.mode()==='future')return;
     if(kind==='task'){
       const L=lockInfo(vd,id);if(!L)return;
       if((!L.checked&&!L.canCheck)||(L.checked&&(L.laterDone||L.t.kind==='w'))){this.go=true;try{toggle(id)}finally{this.go=false}return}
@@ -2332,6 +2344,41 @@ function widgetSettings(){
   <p class="sm mu" style="margin-top:8px">${nat?'To add one: press and hold an empty spot on your home screen, tap Widgets, then choose COLD LOGIC. They refresh whenever you leave the app.':'Widgets are only available in the installed Android app.'}</p></section>`;
 }
 
+/* ================= v27: date lockouts, single edit toggle ================= */
+const Edit={on:false};
+const Lock={
+  mode(d){const k=iso(d||vd),t=iso(new Date());return k>t?'future':k<t?'past':'today'},
+  sealed(id){const k=iso(vd);return k<iso(new Date())&&!!(S.done[k]||{})[id]},
+  /* future days: nothing can be ticked or changed. Past days: a completed task is sealed. Silent: no toast, no sound. */
+  blocked(id){const m=this.mode();return m==='future'||(m==='past'&&this.sealed(id))},
+  /* may the schedule item behind this row be edited from the Day timeline? */
+  editOk(it){
+    if(!it)return true;
+    if(typeof cur!=='undefined'&&cur!=='day')return true;     /* the Settings editor is not date-bound */
+    const m=this.mode();if(m==='future')return false;
+    if(m==='past'){
+      const d=S.done[iso(vd)]||{},ids=it.kind==='workout'?tasksFor(vd).filter(t=>t.kind==='w'||t.id==='wrest').map(t=>t.id):[it.id];
+      if(ids.some(i=>d[i]))return false;
+    }
+    return true;
+  },
+  penOk(it){return Edit.on&&this.editOk(it)},
+  paint(){
+    const fut=this.mode()==='future';
+    $$('[data-task],[data-wrow]').forEach(el=>{
+      el.classList.toggle('fut',fut);
+      if(fut){const b=$('.tick[data-toggle]',el);if(b){const h=document.createElement('span');h.className='hol';h.setAttribute('aria-hidden','true');b.replaceWith(h)}}
+    });
+  }
+};
+function editToggle(){
+  return `<div class="tlh"><button class="tlpen${Edit.on?' on':''}" data-v27="edit" aria-pressed="${Edit.on}" aria-label="${Edit.on?'Done editing':'Edit the schedule'}">${ic('pencil')}</button></div>`;
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest&&e.target.closest('[data-v27="edit"]');if(!t)return;
+  Edit.on=!Edit.on;render(true);
+});
+
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
 const SHIELD_COST=500,SHIELD_MAX=2,PR_XP=50,RING_XP={p:40,w:30};
@@ -2342,6 +2389,7 @@ const dKey=()=>iso(vd);
 /* ---------- swipe on timeline rows ---------- */
 const Swipe={r:null,x0:0,y0:0,dx:0,on:false,W:300,just:0,thr:84};
 function swipeWorkout(dx){
+  if(Lock.mode()==='future')return;
   const k=dKey(),ws=tasksFor(vd).filter(t=>t.kind==='w'),m=S.done[k]||{},sk=S.skip[k]||(S.skip[k]={});
   if(!ws.length)return;
   if(dx>0){Sfx.play('lock');buzz('error');toast('Open Work-out and tick each exercise');return}
@@ -2357,7 +2405,7 @@ function swipeWorkout(dx){
 }
 function swipeDone(row,dx){
   if(row.hasAttribute('data-wrow'))return swipeWorkout(dx);
-  const id=row.dataset.task,k=dKey(),L=lockInfo(vd,id);if(!L)return;
+  const id=row.dataset.task,k=dKey(),L=lockInfo(vd,id);if(!L)return;if(Lock.blocked(id))return;
   const sk=S.skip[k]||(S.skip[k]={});
   if(dx>0){
     if(L.checked){toast('Already completed');return}
@@ -2502,6 +2550,7 @@ function liftRow(name,plan){
    <div class="lift-g">${last?`<span class="ghost-t">Last: ${liftTxt(last)}</span><button class="lnk" data-x="lfill">Auto-fill</button>`:'<span class="ghost-t">No previous session yet</span>'}${td?`<span class="lift-t">Today: ${liftTxt(td)}${td.pr?' <b class="prb">NEW PR</b>':''}</span>`:''}</div></div>`;
 }
 function logLift(t){
+  if(Lock.mode()==='future')return;
   const box=t.closest('.lift'),key=box.dataset.key,g=n=>box.querySelector(`[data-lf=${n}]`);
   const last=lastLift(key);
   const num=(el,def)=>{const v=el.value.trim();return v===''?def:parseFloat(v)};
@@ -3771,7 +3820,7 @@ document.addEventListener('click',e=>{
 function act(t){
   const a=t.dataset.act,id=t.dataset.id;
   switch(a){
-    case 'delx':{const k=iso(vd);S.extras[k]=(S.extras[k]||[]).filter(x=>x.id!==id);if(S.done[k]&&S.done[k][id]){delete S.done[k][id];S.xp=Math.max(0,S.xp-10)}save();render(true);break}
+    case 'delx':{if(Lock.blocked(id))break;const k=iso(vd);S.extras[k]=(S.extras[k]||[]).filter(x=>x.id!==id);if(S.done[k]&&S.done[k][id]){delete S.done[k][id];S.xp=Math.max(0,S.xp-10)}save();render(true);break}
     case 'delfuel':{const k=iso(vd);S.fuel[k]=(S.fuel[k]||[]).filter(x=>x.id!==id);save();render(true);break}
     case 'rest':startRest(+t.dataset.i);break;
     case 'restadd':if(RS){RS.end+=15000;RS.total+=15}break;
@@ -3840,7 +3889,7 @@ function act(t){
     case 'sfxtest':Sfx.play('done');break;
     case 'addfor':openEdit(t.dataset.k,t.dataset.d);break;
     case 'focusform':{const f=$('#view form input:not([type=file]),#view form textarea');if(f){f.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>f.focus({preventScroll:true}),350)}break}
-    case 'rtedit':openRtEdit(id);break;
+    case 'rtedit':if(Lock.editOk(routineEff().find(x=>x.id===id)))openRtEdit(id);break;
     case 'cledit':openClEdit(+t.dataset.wd,t.dataset.hrs.split(',').map(Number));break;
     case 'exedit':openExEdit(+t.dataset.i);break;
     case 'ovreset':delete S.ovr[iso(vd)];save();render(true);toast('Back to your weekly template');break;
@@ -4863,7 +4912,7 @@ document.addEventListener('focusout',()=>{if(Sync.needRender)setTimeout(()=>{con
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)&&!window.__STANDALONE__){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
-window.__dayforge={WB,Hold,Rcpt,receiptData,receiptCanvas,Tags,taskState,winFor,scoreFor,disciplineDelta,Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
+window.__dayforge={Lock,Edit,WB,Hold,Rcpt,receiptData,receiptCanvas,Tags,taskState,winFor,scoreFor,disciplineDelta,Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
   setDate(d){vd=sod(d);follow=false;render(true)}};
 })();
 </script>
