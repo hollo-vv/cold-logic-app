@@ -371,18 +371,51 @@ jobs:
           }
           GRADLE
           tail -14 android/app/build.gradle
+      - name: Add home-screen widgets
+        continue-on-error: true
+        run: |
+          rm -f /tmp/widgets_on
+          rm -rf /tmp/android-clean
+          cp -r android /tmp/android-clean
+          if bash tools/add-widgets.sh; then
+            echo "Widgets added"
+          else
+            echo "::warning::Widgets could not be added. Building without them."
+            rm -rf android
+            cp -r /tmp/android-clean android
+            rm -f /tmp/widgets_on
+          fi
       - name: Sync web files
         run: npx cap sync android
       - name: Build APK
         run: |
+          set -o pipefail
           cd android
           chmod +x gradlew
+          ok=0
           for i in 1 2 3; do
-            ./gradlew assembleDebug --refresh-dependencies && exit 0
+            if ./gradlew assembleDebug --refresh-dependencies 2>&1 | tee /tmp/gradle.log; then ok=1; break; fi
+            if [ -f /tmp/widgets_on ] && grep -qE "error:|Execution failed for task ':app:(compile|process|merge|verify|package)" /tmp/gradle.log; then
+              echo "::warning::The widget code did not build. Building the app without widgets."
+              break
+            fi
             echo "Attempt $i failed, retrying in 30s"
             sleep 30
           done
-          exit 1
+          if [ $ok -ne 1 ]; then
+            if [ -f /tmp/widgets_on ]; then
+              cd ..
+              rm -rf android
+              cp -r /tmp/android-clean android
+              rm -f /tmp/widgets_on
+              npx cap sync android
+              cd android
+              chmod +x gradlew
+              ./gradlew assembleDebug --refresh-dependencies || exit 1
+            else
+              exit 1
+            fi
+          fi
       - name: Show which key signed the APK
         run: |
           keytool -list -v -keystore ~/.android/debug.keystore -storepass android 2>/dev/null | grep -E "SHA256|Alias"
