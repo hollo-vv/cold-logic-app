@@ -131,9 +131,7 @@ public class ColdWidgets {
             String[] p = hhmm.split(":");
             int h = Integer.parseInt(p[0]);
             int m = Integer.parseInt(p[1]);
-            String ap = h >= 12 ? "PM" : "AM";
-            int h12 = (h % 12 == 0) ? 12 : (h % 12);
-            return h12 + ":" + (m < 10 ? "0" : "") + m + " " + ap;
+            return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
         } catch (Exception e) {
             return hhmm;
         }
