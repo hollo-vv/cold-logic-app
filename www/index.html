@@ -1546,6 +1546,7 @@ function vEdit(){
     h+=`${sleepSettings()}
     ${holdSettings()}
     ${statusSettings()}
+    ${widgetSettings()}
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">App version</div><div class="setrow"><div><b>${APP_VER}</b><div class="sm mu" style="margin-top:4px">The app checks for updates by itself.</div></div><button class="btn sm" data-x="updchk">Check now</button></div></section>
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">Diary</div><div class="setrow"><div><b>Diary passcode</b><div class="sm mu" style="margin-top:4px">4-digit code asked every time the diary opens.</div></div><button class="btn sm" data-x="dpass">${ic('lock')}${S.diary.pin?'Change Diary Passcode':'Set Diary Passcode'}</button></div></section>
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">Background</div>
@@ -1742,7 +1743,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611240258',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611240400',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -2290,6 +2291,46 @@ document.addEventListener('click',e=>{
   const t=e.target.closest&&e.target.closest('[data-v24="tags"]');if(!t)return;
   S.tags=!S.tags;save();sync();Tags.apply();render(true);
 });
+
+/* ================= v25: home-screen widgets (Android app) ================= */
+const WB={
+  plug(){try{const C=window.Capacitor;if(C&&(!C.isNativePlatform||C.isNativePlatform()))return (C.Plugins&&C.Plugins.ColdWidget)||C.registerPlugin('ColdWidget')}catch(e){}return null},
+  /* adds what the focus and sleep widget needs, then hands the JSON to the native side */
+  push(j){
+    const p=this.plug();if(!p)return;
+    try{
+      const s=typeof j==='string'?JSON.parse(j):j,k=iso(new Date());
+      s.focusMin=(S.focus&&S.focus.log||[]).filter(x=>x.d===k).reduce((a,x)=>a+(+x.min||0),0);
+      s.cutoff=(S.sleep&&S.sleep.cutoff)||'22:20';s.sleepOn=!(S.sleep&&S.sleep.on===false);
+      s.water=S.water[k]||0;s.waterGoal=S.waterGoal||3000;
+      p.update({json:JSON.stringify(s)}).catch(()=>{});
+    }catch(e){}
+  },
+  now(){try{this.push(widgetState())}catch(e){}},
+  /* a widget button opens the app with a target: Day, Work-out, Fuel, or +250 ml water */
+  async launch(){
+    const p=this.plug();if(!p)return;
+    try{
+      const r=await p.launchTarget();if(!r||!r.go)return;
+      vd=sod(new Date());follow=true;
+      if(r.go==='water'){const k=iso(new Date());S.water[k]=(S.water[k]||0)+250;save();sync();go('fuel');toast('+250 ml water');this.now()}
+      else if(VIEWS[r.go])go(r.go);
+    }catch(e){}
+  },
+  start(){
+    window.Android=Object.assign(window.Android||{},{updateWidget:j=>WB.push(j)});
+    if(!this.plug())return;
+    setTimeout(()=>{this.launch();this.now()},900);
+    const A=Guard.app();
+    if(A)try{A.addListener('appStateChange',st=>{this.now();if(st&&st.isActive)this.launch()})}catch(e){}
+  }
+};
+function widgetSettings(){
+  const nat=!!WB.plug();
+  return `<section class="card"><div class="eyebrow" style="margin-bottom:10px">Home-screen widgets</div>
+  <p class="sm mu">Four Android widgets: Today progress, Now and next, Quick buttons (Day, Work-out, Fuel, +250 ml water) and Focus with a live sleep-cutoff countdown.</p>
+  <p class="sm mu" style="margin-top:8px">${nat?'To add one: press and hold an empty spot on your home screen, tap Widgets, then choose COLD LOGIC. They refresh whenever you leave the app.':'Widgets are only available in the installed Android app.'}</p></section>`;
+}
 
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
@@ -4812,7 +4853,7 @@ Snd.clink=function(){
     if(Math.random()<.4){const t=t0+hits*.1,o=c.createOscillator(),g=c.createGain();o.frequency.setValueAtTime(170,t);o.frequency.exponentialRampToValueAtTime(80,t+.08);
       g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.06,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(out);o.start(t);o.stop(t+.14)}
   };
-  Guard.init();Updater.start();Sleep.start();Tags.apply();
+  Guard.init();Updater.start();Sleep.start();Tags.apply();WB.start();
 try{const A=Guard.app();if(A)A.addListener('appStateChange',s=>{if(!s.isActive)Diary.lock()})}catch(e){}
 Notif.check();Notif.plan();
 setInterval(()=>Notif.check(),15000);
@@ -4822,7 +4863,7 @@ document.addEventListener('focusout',()=>{if(Sync.needRender)setTimeout(()=>{con
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)&&!window.__STANDALONE__){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
-window.__dayforge={Hold,Rcpt,receiptData,receiptCanvas,Tags,taskState,winFor,scoreFor,disciplineDelta,Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
+window.__dayforge={WB,Hold,Rcpt,receiptData,receiptCanvas,Tags,taskState,winFor,scoreFor,disciplineDelta,Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
   setDate(d){vd=sod(d);follow=false;render(true)}};
 })();
 </script>
