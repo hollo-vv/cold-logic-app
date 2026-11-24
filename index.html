@@ -919,6 +919,42 @@ html[data-night] .hc.h1{background:#7f1d1d}
 #fxflash.go::before{animation:fxr 1s cubic-bezier(.1,.6,.2,1) both}
 @keyframes fxr{from{transform:scale(.2)}to{transform:scale(3.2)}}
 @media (prefers-reduced-motion:reduce){#fxflash.go,#fxflash.go::before{animation:none}}
+/* v24 */
+.tick.holding{touch-action:none;transform:scale(.94)}
+.tick,.holdbtn{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.tick{-webkit-tap-highlight-color:transparent}
+.rb .hline{position:absolute;height:1px;background:#e3e6eb;box-shadow:0 0 5px rgba(227,230,235,.55);transform-origin:left center;transform:scaleX(var(--hp,0));pointer-events:none}
+.row .rb{position:relative}
+.row.held .rb b{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:#e3e6eb}
+.row.hset .tick{box-shadow:inset 0 0 0 1px rgba(227,230,235,.55)}
+.holdbtn{position:relative;overflow:hidden;width:100%;height:58px;border-radius:16px;background:#0a0a0f;border:1px solid #6b7280;color:#e5e7eb;font-weight:600;letter-spacing:.04em;touch-action:none}
+.holdbtn span{position:relative;z-index:1}
+.holdbtn .hfill{position:absolute;inset:0;background:linear-gradient(90deg,#4b5563,#9ca3af);transform-origin:left;transform:scaleX(var(--hp,0))}
+.holdbtn.off{opacity:.55}
+.hcard.done .hst{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:#e3e6eb;font-size:17px;font-weight:600}
+.hct{margin:8px 0 6px}
+#rcpt{position:fixed;inset:0;z-index:9985;background:rgba(0,0,0,.92);display:flex;flex-direction:column;opacity:0;transition:opacity .25s}
+#rcpt.in{opacity:1}
+.rc-in{display:flex;flex-direction:column;height:100%;max-width:520px;width:100%;margin:0 auto}
+.rc-sc{flex:1;overflow:auto;padding:20px 16px;-webkit-overflow-scrolling:touch}
+.rc-sc img{display:block;width:100%;max-width:384px;margin:0 auto;background:#fff;image-rendering:pixelated;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+.rc-bar{display:flex;gap:8px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line2)}
+.rc-bar .btn{flex:1}
+.row.held.done .tick{background:transparent;border-color:#cfd3da;color:#e3e6eb;box-shadow:none}
+.row.held.done .dot{background:#cfd3da;border-color:#cfd3da;box-shadow:none}
+.row.held.done .tick.pop{animation:none}
+
+html[data-tags] .tick,html[data-tags] .done .tick,html[data-tags] .done>.tick{width:auto;min-width:46px;height:auto;min-height:36px;padding:4px 2px;border:0;border-radius:6px;background:none;box-shadow:none;color:var(--mu);font:600 10px/1.35 var(--mono);letter-spacing:.02em;white-space:pre;text-align:center;justify-self:end}
+html[data-tags] .tick svg{display:none}
+html[data-tags] .tick::before{content:attr(data-tag)}
+html[data-tags] .tick:not([data-tag])::before{content:"[----]"}
+html[data-tags] .tick.fx::after{display:none}
+html[data-tags] .tick[data-st=EXEC],html[data-tags] .tick[data-st=DONE]{color:#e3e6eb}
+html[data-tags] .tick[data-st=LATE]{color:#f59e0b}
+html[data-tags] .tick[data-st=VOID]{color:#ef4444}
+html[data-tags] .tick[data-st=LOCK]{color:#e3e6eb;text-shadow:0 0 6px rgba(227,230,235,.6)}
+html[data-tags] .tick[data-st=PEND]{color:var(--mu2)}
+html[data-tags] .tick.holding{transform:none;background:rgba(227,230,235,.12)}
 </style>
 </head>
 <body>
@@ -1082,7 +1118,7 @@ function defaults(){
     tt,wk,routine,exams:[],
     habits:[['Workout','💪',3,[1,2,3,5,6]],['Sandhya Vandhanam','🙏',0,[0,1,2,3,4,5,6]],['Reading','📖',2,[0,1,2,3,4,5,6]],['Hydration','💧',1,[0,1,2,3,4,5,6]],['Study Session','🎯',4,[1,2,3,4,5,6]]].map((h,i)=>({id:'h_seed'+i,n:h[0],ic:h[1],col:['#8b5cf6','#22d3ee','#fbbf24','#34d399','#fb7185'][h[2]],days:h[3],log:{},created:iso(new Date())})),
     todos:[],diary:{pin:'',salt:'',entries:[]},
-    skip:{},ready:{},shield:{n:0,used:[],chk:''},alerts:[],spend:[],xpOpen:{},xpDay:{},sleep:{cutoff:'22:20',on:true,log:{}},lifts:{},prs:{},prLog:[],focus:{log:[],broken:[]},rewards:{},
+    skip:{},ready:{},shield:{n:0,used:[],chk:''},alerts:[],spend:[],xpOpen:{},xpDay:{},sleep:{cutoff:'22:20',on:true,log:{}},hold:{on:true,ids:['wake']},heldAt:{},doneAt:{},commit:{},lifts:{},prs:{},prLog:[],focus:{log:[],broken:[]},rewards:{},
     staples:[['Protein shake',150,25],['2 boiled eggs',155,13],['Greek yogurt',100,10],['Paneer 100g',265,18],['Peanut butter toast',260,10]].map((s,i)=>({id:'s_seed'+i,n:s[0],kcal:s[1],p:s[2]}))
   };
 }
@@ -1114,7 +1150,7 @@ function fixup(){
   if(!Array.isArray(S.diary.entries))S.diary.entries=[];
   if(typeof S.diary.pin!=='string')S.diary.pin='';if(typeof S.diary.salt!=='string')S.diary.salt='';
   const O=k=>{if(!S[k]||typeof S[k]!=='object'||Array.isArray(S[k]))S[k]={}},A=k=>{if(!Array.isArray(S[k]))S[k]=[]};
-  ['skip','ready','xpOpen','lifts','prs','rewards','xpDay'].forEach(O);S.sleep=Object.assign({cutoff:'22:20',on:true},S.sleep||{});if(!S.sleep.log||typeof S.sleep.log!=='object')S.sleep.log={};['alerts','spend','prLog'].forEach(A);
+  ['skip','ready','xpOpen','lifts','prs','rewards','xpDay'].forEach(O);S.sleep=Object.assign({cutoff:'22:20',on:true},S.sleep||{});if(!S.sleep.log||typeof S.sleep.log!=='object')S.sleep.log={};S.hold=Object.assign({on:true,ids:['wake']},S.hold||{});if(!Array.isArray(S.hold.ids))S.hold.ids=['wake'];['heldAt','doneAt','commit'].forEach(O);['alerts','spend','prLog'].forEach(A);
   O('shield');if(typeof S.shield.n!=='number')S.shield.n=0;if(!Array.isArray(S.shield.used))S.shield.used=[];if(typeof S.shield.chk!=='string')S.shield.chk='';
   O('focus');if(!Array.isArray(S.focus.log))S.focus.log=[];if(!Array.isArray(S.focus.broken))S.focus.broken=[];
   if(!Array.isArray(S.staples))S.staples=d.staples;
@@ -1243,18 +1279,18 @@ function deny(id,msg){
   const b=$('[data-toggle="'+id+'"]');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),400)}
 }
 function toggle(id){
-  const L=lockInfo(vd,id);if(!L)return;
+  const L=lockInfo(vd,id);if(!L)return;if(Hold.gate(id))return;
   const t=L.t,k=iso(vd),m=S.done[k]||(S.done[k]={});
   if(L.checked){
     if(t.kind==='w'){deny(id,'Work-out items stay checked once done');return}
     if(L.laterDone){deny(id,'Locked: a later task is already done');return}
-    delete m[id];S.xp=Math.max(0,S.xp-t.xp);Sfx.play('off');buzz();
+    delete m[id];unstampDone(k,id);S.xp=Math.max(0,S.xp-t.xp);if(!Hold.q){Sfx.play('off');buzz()}
   }else{
     if(!L.canCheck){deny(id,'Finish the earlier tasks first');return}
-    m[id]=1;if(S.skip[k])delete S.skip[k][id];const l0=level();S.xp+=t.xp;toast('+'+t.xp+' XP');
+    m[id]=1;stampDone(k,id);if(S.skip[k])delete S.skip[k][id];const l0=level();S.xp+=t.xp;if(!Hold.q)toast('+'+t.xp+' XP');
     if(level()>l0)setTimeout(()=>toast('Level '+level()+' reached'),500);
-    Sfx.play('done');buzz();
-    const b=$('[data-toggle="'+id+'"]');if(b){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');setTimeout(()=>b.classList.remove('pop'),500)}
+    if(!Hold.q){Sfx.play('done');buzz()}
+    const b=Hold.q?null:$('[data-toggle="'+id+'"]');if(b){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');setTimeout(()=>b.classList.remove('pop'),500)}
     const before=S.hist[k];updateHist(vd);
     if(before!==undefined&&before<STREAK_PCT&&S.hist[k]>=STREAK_PCT&&isToday(vd))setTimeout(()=>toast('80% reached: streak extended'),900);
   }
@@ -1272,7 +1308,7 @@ function tween(el,to){
   (function f(t){const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(to-from)*e);if(k<1)requestAnimationFrame(f)})(t0);
 }
 function sync(){
-  updateHist(vd);
+  Hold.paint();Tags.paint();updateHist(vd);
   const s=stats(vd),pct=s.pct;
   $$('[data-task]').forEach(el=>el.classList.toggle('done',!!s.m[el.dataset.task]));
   { const tk=s.tasks,sk=S.skip[iso(vd)]||{};
@@ -1439,7 +1475,7 @@ function vFuel(){
   const kc=log.reduce((a,x)=>a+(+x.kcal||0),0),pr=log.reduce((a,x)=>a+(+x.p||0),0);
   fuelRewards(k);
   let h=dateNav()+`<div class="stagger">`;
-  h+=fuelRings(k)+staplesCard();
+  h+=fuelRings(k)+staplesCard()+Hold.fuelCard(k,kc,pr);
   h+=`<section class="card"><div class="eyebrow">Daily fuel</div>
    <div style="margin-top:12px"><div class="mrow"><b>${kc}<span> kcal</span></b><span>goal ${g.kcal}+</span></div><div class="meter" data-p="${Math.min(100,kc/g.kcal*100)}"><i></i></div><span class="sm mu">${kc>=g.kcal?'Calorie floor reached':(g.kcal-kc)+' kcal to go'}</span></div>
    <div style="margin-top:20px"><div class="mrow"><b>${pr}<span> g protein</span></b><span>goal ${g.protein} g</span></div><div class="meter" data-p="${Math.min(100,pr/g.protein*100)}"><i></i></div><span class="sm mu">${pr>=g.protein?'Protein target reached':(g.protein-pr)+' g to go'}</span></div></section>`;
@@ -1508,6 +1544,8 @@ function vEdit(){
   if(etab==='gen'){
     const hp=S.haptic,sf=S.sfx,canV=!!navigator.vibrate;
     h+=`${sleepSettings()}
+    ${holdSettings()}
+    ${statusSettings()}
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">App version</div><div class="setrow"><div><b>${APP_VER}</b><div class="sm mu" style="margin-top:4px">The app checks for updates by itself.</div></div><button class="btn sm" data-x="updchk">Check now</button></div></section>
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">Diary</div><div class="setrow"><div><b>Diary passcode</b><div class="sm mu" style="margin-top:4px">4-digit code asked every time the diary opens.</div></div><button class="btn sm" data-x="dpass">${ic('lock')}${S.diary.pin?'Change Diary Passcode':'Set Diary Passcode'}</button></div></section>
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">Background</div>
@@ -1699,11 +1737,12 @@ function vProfile(){
    ${reportCard()}
    ${heatCard()}
    ${sleepCard()}
+   ${receiptCard()}
    ${installEvt?`<section class="card row2"><div class="grow"><b>Install the app</b><p class="sm mu">Adds 𝙲𝙾𝙻𝙳 𝙻𝙾𝙶𝙸𝙲 to your home screen or desktop.</p></div><button class="btn" data-act="install">Install</button></section>`:''}</div>`;
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611231242',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/actions';
+const APP_VER='202611240258',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -1944,6 +1983,313 @@ document.addEventListener('change',e=>{
   const t=e.target;if(t&&t.dataset&&t.dataset.v23==='cut'&&/^\d{2}:\d{2}$/.test(t.value)){S.sleep.cutoff=t.value;Sleep.dis='';save();sync();Sleep.tick(true);toast('Cutoff set to '+fmtT(t.value))}
 });
 document.addEventListener('click',e=>{const g=$('#hwrap');if(g&&!e.target.closest('#hwrap')){const t=$('#htip');if(t)t.hidden=true;$$('.hc.sel',g).forEach(x=>x.classList.remove('sel'))}});
+
+/* ================= v24: hold-to-commit · end-of-day receipt ================= */
+const HOLD_MS=1200;
+const hhmm=d=>{d=d||new Date();return pad(d.getHours())+':'+pad(d.getMinutes())};
+function stampDone(k,id){(S.doneAt[k]||(S.doneAt[k]={}))[id]=hhmm()}
+function unstampDone(k,id){if(S.doneAt[k])delete S.doneAt[k][id];if(S.heldAt[k])delete S.heldAt[k][id]}
+const Hold={go:false,q:false,cur:null,eat:0,aud:null,
+  on(id){return !!(S.hold&&S.hold.on!==false&&S.hold.ids&&S.hold.ids.includes(id))},
+  gate(id){if(this.go||!this.on(id))return false;if(!this.cur)toast('Hold the tick for 1.2 s');return true},
+  targetsOk(k){const g=S.fuelGoal,log=S.fuel[k]||[],kc=log.reduce((a,x)=>a+(+x.kcal||0),0),pr=log.reduce((a,x)=>a+(+x.p||0),0);return {ok:kc>=g.kcal&&pr>=g.protein,kc,pr}},
+  /* sub-bass hum that rises for as long as the hold lasts */
+  hum(){
+    try{
+      if(!Sfx.on())return;const c=ac();if(!c)return;const t=c.currentTime,vol=(S.sfx&&S.sfx.vol!=null)?S.sfx.vol:.7;
+      const o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),g2=c.createGain(),m=c.createGain();
+      o.type='sine';o.frequency.setValueAtTime(40,t);o.frequency.exponentialRampToValueAtTime(92,t+HOLD_MS/1000);
+      o2.type='triangle';o2.frequency.setValueAtTime(80,t);o2.frequency.exponentialRampToValueAtTime(184,t+HOLD_MS/1000);   /* the octave, so small speakers still carry it */
+      g.gain.value=.9;g2.gain.value=.16;
+      m.gain.setValueAtTime(.0001,t);m.gain.exponentialRampToValueAtTime(.55*vol+.0001,t+HOLD_MS/1000);
+      o.connect(g).connect(m);o2.connect(g2).connect(m);m.connect(c.destination);o.start(t);o2.start(t);
+      this.aud={o,o2,m,c};
+    }catch(e){this.aud=null}
+  },
+  hushHum(fast){
+    const a=this.aud;this.aud=null;if(!a)return;
+    try{const t=a.c.currentTime;a.m.gain.cancelScheduledValues(t);a.m.gain.setValueAtTime(Math.max(.0001,a.m.gain.value),t);a.m.gain.exponentialRampToValueAtTime(.0001,t+(fast?.03:.14));a.o.stop(t+.2);a.o2.stop(t+.2)}catch(e){}
+  },
+  thud(){try{if(navigator.vibrate&&S.haptic&&S.haptic.on!==false)navigator.vibrate((S.haptic.level==='light')?60:100)}catch(e){}},
+  start(el,id,kind,e){
+    if(this.cur)return;
+    const k=iso(vd);
+    if(kind==='task'){
+      const L=lockInfo(vd,id);if(!L)return;
+      if((!L.checked&&!L.canCheck)||(L.checked&&(L.laterDone||L.t.kind==='w'))){this.go=true;try{toggle(id)}finally{this.go=false}return}
+    }else{
+      if(S.commit[k])return;
+      if(!this.targetsOk(k).ok){toast('Calorie floor and protein goal not reached yet');el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),400);return}
+    }
+    this.cur={el,id,kind,t0:performance.now(),x:e?e.clientX:0,y:e?e.clientY:0,line:null};
+    el.classList.add('holding');
+    if(kind==='task'){
+      const rb=el.closest('[data-task]');const host=rb&&rb.querySelector('.rb'),b=host&&host.querySelector('b');
+      if(host&&b){const r=document.createRange();r.selectNodeContents(b);const rc=r.getBoundingClientRect(),hr=host.getBoundingClientRect(),ln=document.createElement('i');
+        ln.className='hline';ln.style.cssText=`left:${rc.left-hr.left}px;top:${rc.top+rc.height/2-hr.top}px;width:${rc.width}px`;host.appendChild(ln);this.cur.line=ln;this.cur.rb=rb}
+    }
+    this.hum();
+    const step=()=>{const c=this.cur;if(!c)return;const p=Math.min(1,(performance.now()-c.t0)/HOLD_MS);
+      (c.line||c.el).style.setProperty('--hp',p);
+      if(p>=1)this.commit();else c.raf=requestAnimationFrame(step)};
+    this.cur.raf=requestAnimationFrame(step);
+  },
+  end(){const c=this.cur;this.cur=null;if(!c)return;cancelAnimationFrame(c.raf);c.el.classList.remove('holding');c.el.style.removeProperty('--hp');if(c.line)c.line.remove()},
+  cancel(){if(!this.cur)return;this.hushHum(false);this.end()},
+  commit(){
+    const c=this.cur;if(!c)return;this.hushHum(true);const {id,kind}=c;this.end();this.eat=Date.now();this.thud();
+    const k=iso(vd);
+    this.q=true;this.go=true;
+    try{
+      if(kind==='task'){
+        const before=!!(S.done[k]||{})[id];toggle(id);
+        const now=!!(S.done[k]||{})[id];
+        if(now&&!before)(S.heldAt[k]||(S.heldAt[k]={}))[id]=hhmm()+':'+pad(new Date().getSeconds());
+        else if(!now&&S.heldAt[k])delete S.heldAt[k][id];
+      }else{
+        const t=this.targetsOk(k);
+        if(t.ok&&!S.commit[k]){S.commit[k]={t:hhmm(),kcal:Math.round(t.kc),p:Math.round(t.pr*10)/10};S.xp+=20}
+      }
+    }finally{this.go=false;this.q=false}
+    save();sync();if(kind!=='task')render(true);else this.paint();
+  },
+  paint(){
+    const k=iso(vd),h=S.heldAt[k]||{},d=S.done[k]||{};
+    $$('[data-task]').forEach(r=>{const id=r.dataset.task;r.classList.toggle('hset',this.on(id));r.classList.toggle('held',!!(h[id]&&d[id]))});
+  },
+  fuelCard(k,kc,pr){
+    const g=S.fuelGoal,c=S.commit[k],ok=kc>=g.kcal&&pr>=g.protein;
+    if(c)return `<section class="card hcard done"><div class="eyebrow">Targets</div><div class="hct"><span class="hst">${g.kcal}+ kcal · ${g.protein} g protein</span></div><small class="sm mu">Committed ${esc(fmtT(c.t))} · ${c.kcal} kcal · ${c.p} g protein</small></section>`;
+    return `<section class="card hcard"><div class="eyebrow">Commit targets</div><p class="sm mu" style="margin:6px 0 12px">${ok?'Both targets reached. Hold to commit.':'Reach the calorie floor and the protein goal first.'}</p><button class="holdbtn${ok?'':' off'}" data-hold="targets" aria-label="Hold for 1.2 seconds to commit today's targets"><i class="hfill"></i><span>${ok?'Hold to commit':'Targets not reached'}</span></button></section>`;
+  }
+};
+function holdSettings(){
+  const on=S.hold.on!==false,items=routineSorted().filter(it=>it.kind==='normal');
+  return `<section class="card"><div class="eyebrow" style="margin-bottom:10px">Hold to commit</div>
+  <div class="setrow"><div><b>Deliberate completion</b><div class="sm mu" style="margin-top:4px">High-stakes items need a 1.2 second hold, with a rising bass hum and one heavy thud. No celebration.</div></div><button class="sw ${on?'on':''}" role="switch" aria-checked="${on}" aria-label="Hold to commit" data-v24="hon"><i></i></button></div>
+  <div class="sm mu" style="margin:14px 0 4px">Items that need a hold</div>
+  ${items.map(it=>`<label class="chk" style="margin-top:8px"><input type="checkbox" data-v24="hid" data-id="${esc(it.id)}" ${S.hold.ids.includes(it.id)?'checked':''}><span>${esc(it.n)} · ${esc(fmtT(itemTimes(it)[0]))}</span></label>`).join('')}
+  <p class="sm mu" style="margin-top:12px">Calorie and protein targets on the Fuel page always use the hold.</p></section>`;
+}
+['pointerdown'].forEach(ev=>document.addEventListener(ev,e=>{
+  const b=e.target.closest&&e.target.closest('.tick[data-toggle],[data-hold]');if(!b||(e.button&&e.button>0))return;
+  if(b.dataset.hold)Hold.start(b,'targets','fuel',e);
+  else if(Hold.on(b.dataset.toggle))Hold.start(b,b.dataset.toggle,'task',e);
+}));
+document.addEventListener('pointermove',e=>{const c=Hold.cur;if(c&&Math.hypot(e.clientX-c.x,e.clientY-c.y)>18)Hold.cancel()});
+['pointerup','pointercancel'].forEach(ev=>document.addEventListener(ev,()=>Hold.cancel()));
+window.addEventListener('blur',()=>Hold.cancel());
+document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.tick[data-toggle],[data-hold]')&&(Hold.cur||Date.now()-Hold.eat<1500))e.preventDefault()});
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('.tick[data-toggle],[data-hold]');if(!b)return;
+  if(Date.now()-Hold.eat<800||b.dataset.hold){e.stopImmediatePropagation();e.preventDefault();if(b.dataset.hold&&Date.now()-Hold.eat>=800&&!S.commit[iso(vd)]&&Hold.targetsOk(iso(vd)).ok)toast('Hold the button for 1.2 s')}
+},true);
+document.addEventListener('keydown',e=>{
+  if(e.repeat||(e.key!==' '&&e.key!=='Enter'))return;
+  const b=e.target.closest&&e.target.closest('.tick[data-toggle],[data-hold]');if(!b)return;
+  if(b.dataset.hold){e.preventDefault();Hold.start(b,'targets','fuel')}
+  else if(Hold.on(b.dataset.toggle)){e.preventDefault();Hold.start(b,b.dataset.toggle,'task')}
+});
+document.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter')Hold.cancel()});
+
+/* ---------- end-of-day receipt ---------- */
+const COLS=34;
+const up=s=>String(s==null?'':s).toUpperCase().replace(/[^\x20-\x7E]/g,'');
+const clip=(s,n)=>{s=up(s);return s.length>n?s.slice(0,n-1)+'.':s};
+const lr=(a,b)=>{a=up(a);b=up(b);const room=COLS-b.length-1;if(a.length>room)a=clip(a,room);return a+' '.repeat(Math.max(1,COLS-a.length-b.length))+b};
+const num=n=>Math.round(n).toLocaleString('en-US');
+function receiptData(k){
+  const d=new Date(k+'T00:00:00'),L=[];const B=(s,o)=>L.push(Object.assign({s},o||{}));const SEP=()=>L.push({s:'-'.repeat(COLS)});
+  const nm={};let wx=[];
+  withDate(d,()=>{routineSorted().forEach(it=>{nm[it.id]=it.n;nm[it.kind]=it.n});wx=d.getDay()!==0?workoutFor(d.getDay()).x:[]});
+  (S.extras[k]||[]).forEach(e=>nm[e.id]=e.t||e.n||'Extra task');
+  const st=stats(d),sk=S.skip[k]||{},at=S.doneAt[k]||{},hd=S.heldAt[k]||{};
+  const now=new Date();
+  B('COLD LOGIC',{b:1,c:1,big:1});B('DAILY EXECUTION RECEIPT',{c:1});SEP();
+  B(lr('DATE',d.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})));
+  B(lr('PRINTED',iso(now)+' '+hhmm(now)+':'+pad(now.getSeconds())));
+  SEP();
+  B(lr('TASKS',st.total?st.done+'/'+st.total+'  '+(st.pct||0)+'%':'NONE SCHEDULED'),{b:1});
+  const win=winFor(k);
+  const rows=st.tasks.map(t=>{
+    let n=nm[t.id];if(!n&&/^w\d+$/.test(t.id)){const x=wx[+t.id.slice(1)];n=x?x.a:'Work-out'}
+    if(!n)n=t.id==='wrest'?'Rest day':t.id;
+    const done=!!st.m[t.id];
+    return {n,tm:at[t.id]||'--:--',tag:tagText(taskState(k,t.id,win)),done};
+  });
+  rows.forEach(r=>B(lr(r.tm+' '+r.n,r.tag)));
+  const ts=rows.filter(r=>r.done&&r.tm!=='--:--').map(r=>r.tm).sort();
+  if(ts.length)B(lr('FIRST / LAST DONE',ts[0]+' / '+ts[ts.length-1]));
+  { const hn=Object.keys(hd).filter(i=>st.m[i]).length;if(hn)B(lr('HELD COMMITS',hn)) }
+  SEP();
+  /* volume */
+  let vol=0,sets=0;const lifts=[];
+  for(const key in S.lifts){const e=(S.lifts[key]||[]).find(x=>x.d===k);if(e){const v=e.sets*e.reps*e.kg;vol+=v;sets+=e.sets;lifts.push({key,e,v})}}
+  B('VOLUME LIFTED',{b:1});
+  if(lifts.length){lifts.sort((a,b)=>b.v-a.v).slice(0,8).forEach(l=>{B(clip(l.key,COLS));B(lr('  '+l.e.sets+'X'+l.e.reps+' @ '+l.e.kg+' KG',num(l.v)+' KG'))});
+    B(lr('TOTAL',num(vol)+' KG'),{b:1});B(lr('SETS',sets));
+    const pr=S.prLog.filter(x=>x.d===k).length;if(pr)B(lr('NEW PERSONAL RECORDS',pr))}
+  else B('NONE LOGGED');
+  SEP();
+  /* fuel */
+  const log=S.fuel[k]||[],kc=log.reduce((a,x)=>a+(+x.kcal||0),0),pr=log.reduce((a,x)=>a+(+x.p||0),0),g=S.fuelGoal,ml=S.water[k]||0,wg=S.waterGoal||3000;
+  B('FUEL',{b:1});
+  B(lr('KCAL  '+num(kc)+' / '+num(g.kcal)+'+',kc>=g.kcal?'MET':'SHORT'));
+  B(lr('PROTEIN  '+(Math.round(pr*10)/10)+' / '+g.protein+' G',pr>=g.protein?'MET':'SHORT'));
+  B(lr('WATER  '+num(ml)+' / '+num(wg)+' ML',ml>=wg?'MET':'SHORT'));
+  B(lr('MEALS LOGGED',log.length));
+  if(S.commit[k])B(lr('TARGETS COMMITTED',S.commit[k].t));
+  SEP();
+  /* focus */
+  const fl=S.focus.log.filter(x=>x.d===k),fm=fl.reduce((a,x)=>a+(+x.min||0),0),br=S.focus.broken.filter(x=>x.d===k).length;
+  B('FOCUS',{b:1});
+  B(lr('DEEP WORK',(fm/60).toFixed(1)+' H'));B(lr('BLOCKS',fl.length+(fl.some(x=>x.lock)?'  ('+fl.filter(x=>x.lock).length+' LOCKED)':'')));
+  if(br)B(lr('FOCUS BROKEN',br));
+  SEP();
+  B('BODY',{b:1});
+  if(S.ready[k]!=null)B(lr('READINESS',S.ready[k]+' / 100'));
+  const sl=S.sleep&&S.sleep.log&&S.sleep.log[k];B(lr('LIGHTS OUT',sl?(sl.ok?'[LOCK] ':'[LATE] ')+sl.t:(k<iso(new Date())?'[VOID]':'[PEND]')));
+  try{const hb=(S.habits||[]).filter(h=>!h.arch);if(hb.length)B(lr('HABITS',hb.filter(h=>h.log&&h.log[k]).length+'/'+hb.length))}catch(e){}
+  { const sc=scoreFor(k);B(lr('EXECUTION SCORE',sc==null?'N/A':sc.toFixed(2)));const dl=disciplineDelta(k);B(lr('DISCIPLINE DELTA',dl==null?'N/A':(dl>=0?'+':'-')+Math.abs(dl).toFixed(2)),{b:1}) }
+  try{B(lr('CONTINUITY',String(streakInfo(addDays(d,1)).cur).padStart(4,'0')+' CYCLES'))}catch(e){}
+  return L;
+}
+async function sha256hex(t){
+  try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){let h=2166136261>>>0,o='';for(let r=0;r<8;r++){for(let i=0;i<t.length;i++){h^=t.charCodeAt(i)+r;h=Math.imul(h,16777619)>>>0}o+=h.toString(16).padStart(8,'0')}return o}
+}
+async function receiptCanvas(k){
+  const L=receiptData(k),hash=await sha256hex(L.map(x=>x.s).join('\n'));
+  L.push({s:'-'.repeat(COLS)});L.push({s:'SHA-256 OF THE LINES ABOVE',c:1});L.push({s:hash.slice(0,32).toUpperCase(),c:1});L.push({s:hash.slice(32).toUpperCase(),c:1});
+  const W=768,P=30,cv=document.createElement('canvas'),probe=cv.getContext('2d');
+  let fs=44;const fam='"Courier New","DejaVu Sans Mono","Roboto Mono",monospace';
+  probe.font=`${fs}px ${fam}`;while(fs>12&&probe.measureText('M'.repeat(COLS)).width>W-P*2){fs--;probe.font=`${fs}px ${fam}`}
+  const lh=Math.round(fs*1.38),strip=84,H=P*2+L.length*lh+strip+lh*2+40;
+  cv.width=W;cv.height=H;const g=cv.getContext('2d');
+  g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#000';g.textBaseline='middle';
+  const cw=g.measureText('M').width;let y=P;
+  L.forEach(l=>{
+    const f=l.big?Math.round(fs*1.5):fs;g.font=`${l.b?'bold ':''}${f}px ${fam}`;
+    const w=g.measureText(l.s).width;const x=l.c?(W-w)/2:P;g.fillText(l.s,x,y+lh/2);y+=l.big?Math.round(lh*1.4):lh;
+  });
+  /* check strip: one bar per bit of the hash. A visual checksum, not a scannable barcode. */
+  y+=lh*.3;const bits=[];for(const ch of hash)for(let i=3;i>=0;i--)bits.push((parseInt(ch,16)>>i)&1);
+  const bw=(W-P*2)/bits.length;bits.forEach((b,i)=>{if(b)g.fillRect(P+i*bw,y,Math.max(1,bw*.9),strip)});y+=strip+lh*.7;
+  g.font=`${fs}px ${fam}`;const end='END OF RECORD';g.fillText(end,(W-g.measureText(end).width)/2,y);
+  /* 1-bit: every pixel pure black or pure white */
+  const im=g.getImageData(0,0,W,H),d=im.data;
+  for(let i=0;i<d.length;i+=4){const v=d[i]*.3+d[i+1]*.59+d[i+2]*.11<150?0:255;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255}
+  g.putImageData(im,0,0);
+  return cv;
+}
+const Rcpt={cv:null,k:null,
+  async open(k){
+    toast('Printing receipt');
+    try{this.cv=await receiptCanvas(k)}catch(e){toast('Could not build the receipt');return}
+    this.k=k;this.close(true);
+    const el=document.createElement('div');el.id='rcpt';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
+    el.innerHTML=`<div class="rc-in"><div class="rc-sc"><img alt="End-of-day receipt for ${esc(k)}" src="${this.cv.toDataURL('image/png')}"></div><div class="rc-bar"><button class="btn" data-v24="rcshare">Share</button><button class="btn ghost" data-v24="rcsave">Save PNG</button><button class="btn ghost" data-v24="rcclose">Close</button></div></div>`;
+    document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add('in'));
+  },
+  close(now){const e=document.getElementById('rcpt');if(e){if(now)e.remove();else{e.classList.remove('in');setTimeout(()=>e.remove(),250)}}},
+  blob(){return new Promise(r=>this.cv.toBlob(r,'image/png'))},
+  fname(){return 'ColdLogic-receipt-'+this.k+'.png'},
+  async share(){
+    const b=await this.blob(),f=new File([b],this.fname(),{type:'image/png'});
+    try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Cold Logic receipt '+this.k});return}}catch(e){if(e&&e.name==='AbortError')return}
+    this.save();toast('Sharing is not available here. Saved instead');
+  },
+  async save(){
+    const b=await this.blob(),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=this.fname();document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800);
+  }
+};
+function receiptCard(){
+  const t=iso(new Date());
+  return `<section class="card"><div class="eyebrow">End-of-day receipt</div><p class="sm mu" style="margin:6px 0 12px">A black and white thermal-style printout of the day: completion times, volume lifted, macros, focus hours. Plain data only.</p>
+  <div class="row2" style="align-items:center;gap:10px"><input type="date" id="rcDate" value="${t}" max="${t}" min="${esc(S.first||t)}" style="flex:1;min-width:0" aria-label="Receipt date"><button class="btn" data-v24="rcpt">Generate</button></div></section>`;
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest&&e.target.closest('[data-v24]');if(!t)return;const a=t.dataset.v24;
+  if(a==='hon'){S.hold.on=!(S.hold.on!==false);save();sync();render(true)}
+  else if(a==='rcpt'){const v=($('#rcDate')||{}).value||iso(new Date());Rcpt.open(v)}
+  else if(a==='rcshare')Rcpt.share();
+  else if(a==='rcsave')Rcpt.save();
+  else if(a==='rcclose')Rcpt.close();
+});
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t||!t.dataset||t.dataset.v24!=='hid')return;
+  const id=t.dataset.id,s=new Set(S.hold.ids);t.checked?s.add(id):s.delete(id);S.hold.ids=[...s];save();sync();
+});
+
+/* ---------- system states: EXEC / LATE / VOID / LOCK ---------- */
+/* scheduled window of every task id on a date: ids -> [startMin,endMin] */
+function winFor(k){
+  const d=new Date(k+'T00:00:00'),w={};
+  withDate(d,()=>{
+    const wd=d.getDay();let nx=0;
+    try{nx=wd!==0?workoutFor(wd).x.length:0}catch(e){}
+    routineSorted().forEach(it=>{
+      const [a,b]=itemTimes(it),sm=mins(a),em=b?mins(b):sm+30,r=[sm,em];
+      w[it.id]=r;
+      if(it.kind==='workout'){for(let i=0;i<nx;i++)w['w'+i]=r;w.wrest=r}
+      else if(GROUPS[it.kind])w[it.kind]=r;
+    });
+  });
+  return w;
+}
+/* EXEC = completed by the end of its window · LATE = after it · VOID = skipped or never done on a past day
+   LOCK = the sleep cutoff was honored · PEND = still open today or later · DONE = completed, but done before times were recorded */
+function taskState(k,id,win){
+  const m=S.done[k]||{},sk=S.skip[k]||{},at=(S.doneAt[k]||{})[id];
+  if(id==='sleep'&&S.sleep&&S.sleep.log&&S.sleep.log[k]&&S.sleep.log[k].ok)return {s:'LOCK'};
+  if(m[id]){
+    if(!at)return {s:'DONE'};
+    const w=win&&win[id];if(!w)return {s:'EXEC'};
+    let t=mins(at),a=w[0],b=w[1];if(b<a)b+=1440;if(t<a&&b>1440)t+=1440;
+    return t>b?{s:'LATE',n:t-b}:{s:'EXEC'};
+  }
+  if(sk[id])return {s:'VOID'};
+  return {s:k<iso(new Date())?'VOID':'PEND'};
+}
+const tagText=o=>'['+o.s+(o.s==='LATE'?' +'+o.n+'MIN':'')+']';
+/* 0..1: EXEC / LOCK / DONE count fully, LATE counts half */
+function scoreFor(k){
+  const d=new Date(k+'T00:00:00'),ts=tasksFor(d);if(!ts.length)return null;
+  const win=winFor(k);let v=0;
+  ts.forEach(t=>{const s=taskState(k,t.id,win).s;v+=(s==='EXEC'||s==='LOCK'||s==='DONE')?1:s==='LATE'?.5:0});
+  return v/ts.length;
+}
+/* today's score minus the average of the previous 7 scheduled days */
+function disciplineDelta(k){
+  const sc=scoreFor(k);if(sc==null)return null;
+  const d=new Date(k+'T00:00:00'),prev=[];
+  for(let i=1;i<=7;i++){const p=scoreFor(iso(addDays(d,-i)));if(p!=null)prev.push(p)}
+  return prev.length?sc-prev.reduce((a,b)=>a+b,0)/prev.length:0;
+}
+const Tags={
+  on(){return !!(S&&S.tags)},
+  apply(){const h=document.documentElement;if(this.on())h.dataset.tags='1';else delete h.dataset.tags},
+  paint(){
+    if(!this.on())return;
+    const k=iso(vd),win=winFor(k);
+    $$('[data-task]').forEach(r=>{
+      const b=$('.tick[data-toggle]',r);if(!b)return;
+      const o=taskState(k,r.dataset.task,win);
+      b.dataset.st=o.s;b.dataset.tag='['+o.s+']'+(o.s==='LATE'?'\n+'+o.n+'m':'');
+      b.setAttribute('aria-label',tagText(o));
+    });
+  }
+};
+function statusSettings(){
+  const t=S.tags;
+  return `<section class="card"><div class="eyebrow" style="margin-bottom:10px">Task status style</div>
+  <div class="setrow"><div><b>System tags instead of ticks</b><div class="sm mu" style="margin-top:4px">Shows [EXEC] done in time, [LATE +min] done after the window, [VOID] skipped or missed, [LOCK] sleep cutoff honored. Receipts always use the tags.</div></div><button class="sw ${t?'on':''}" role="switch" aria-checked="${!!t}" aria-label="System tags instead of ticks" data-v24="tags"><i></i></button></div></section>`;
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest&&e.target.closest('[data-v24="tags"]');if(!t)return;
+  S.tags=!S.tags;save();sync();Tags.apply();render(true);
+});
 
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
@@ -4466,7 +4812,7 @@ Snd.clink=function(){
     if(Math.random()<.4){const t=t0+hits*.1,o=c.createOscillator(),g=c.createGain();o.frequency.setValueAtTime(170,t);o.frequency.exponentialRampToValueAtTime(80,t+.08);
       g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.06,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(out);o.start(t);o.stop(t+.14)}
   };
-  Guard.init();Updater.start();Sleep.start();
+  Guard.init();Updater.start();Sleep.start();Tags.apply();
 try{const A=Guard.app();if(A)A.addListener('appStateChange',s=>{if(!s.isActive)Diary.lock()})}catch(e){}
 Notif.check();Notif.plan();
 setInterval(()=>Notif.check(),15000);
@@ -4476,7 +4822,7 @@ document.addEventListener('focusout',()=>{if(Sync.needRender)setTimeout(()=>{con
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)&&!window.__STANDALONE__){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
-window.__dayforge={Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
+window.__dayforge={Hold,Rcpt,receiptData,receiptCanvas,Tags,taskState,winFor,scoreFor,disciplineDelta,Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
   setDate(d){vd=sod(d);follow=false;render(true)}};
 })();
 </script>
