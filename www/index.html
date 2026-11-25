@@ -1117,6 +1117,12 @@ html[data-tags] .tl .row.now .now-tag{white-space:nowrap}
 .ring.dial .hh{position:absolute;left:50%;top:50%;width:3.5px;height:15%;border-radius:3px;background:var(--cy,#22d3ee);box-shadow:0 0 6px rgba(34,211,238,.7);transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(var(--hh,0deg));pointer-events:none}
 .ring.dial .hc{position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);pointer-events:none}
 .ring.dial::after{background:radial-gradient(circle,rgba(255,255,255,.07),rgba(255,255,255,0) 70%),repeating-conic-gradient(rgba(255,255,255,.34) 0 1.6deg,transparent 1.6deg 30deg)}
+/* v29: wave terrain behind the Focus Lock timer */
+#flwave{position:absolute;inset:0;width:100%;height:100%;z-index:0;touch-action:none;display:block}
+#flock>*:not(#flwave){position:relative;z-index:1}
+#flock .fl-snd button:not(.on){background:rgba(0,0,0,.72)}
+#flock .btn.ghost{background:rgba(0,0,0,.72)}
+#flock .fl-top{text-shadow:0 0 8px #000,0 0 16px #000}
 </style>
 </head>
 <body>
@@ -1807,7 +1813,7 @@ function musicCard(){
   const canTab=!!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia)&&!/Android|iPhone|iPad/i.test(navigator.userAgent);
   const st=m==='files'&&t?`Playing from your files: <b>${esc(t.name)}</b> (${Music.idx+1} of ${Music.list.length})`:m==='mic'?'Listening through the microphone. The ring follows whatever music is playing nearby.':m==='tab'?'Following the audio of the tab you shared.':'The ring uses its built-in groove until music is connected.';
   return `<section class="card"><div class="eyebrow" style="margin-bottom:8px">Music &amp; visualizer</div>
-   <p class="sm mu">Make the ring in the header dance to your music. Pick whichever way fits how you listen.</p>
+   <p class="sm mu">Make the orb in the header dance to your music. Pick whichever way fits how you listen.</p>
    <p class="sm" style="margin-top:10px">${st}</p>
    <div class="fld" style="margin-top:12px"><label>1. Play music files here</label>
     <div class="row2" style="flex-wrap:wrap"><button class="btn sm" data-act="mpick">Choose songs</button><input type="file" accept="audio/*" multiple data-f="musicfiles" hidden>
@@ -1815,7 +1821,7 @@ function musicCard(){
     <p class="sm mu" style="margin-top:6px">Exact, real-time reaction. Files stay on your device.</p></div>
    <div class="fld" style="margin-top:12px"><label>2. Follow another app (LastWave, Spotify, anything)</label>
     <div class="row2" style="flex-wrap:wrap"><button class="btn sm ${m==='mic'?'':'ghost'}" data-act="mmic">${m==='mic'?'Stop listening':'Listen with microphone'}</button></div>
-    <p class="sm mu" style="margin-top:6px">Phones cannot share another app's audio, so the ring listens to the sound through the microphone. Play music on the speaker with the volume up. It works best in a quiet room. Nothing is recorded or sent anywhere.</p></div>
+    <p class="sm mu" style="margin-top:6px">Phones cannot share another app's audio, so the orb listens to the sound through the microphone. Play music on the speaker with the volume up. It works best in a quiet room. Nothing is recorded or sent anywhere.</p></div>
    ${canTab?`<div class="fld" style="margin-top:12px"><label>3. Capture a browser tab (desktop)</label>
     <div class="row2" style="flex-wrap:wrap"><button class="btn sm ${m==='tab'?'':'ghost'}" data-act="mtab">${m==='tab'?'Stop capture':'Capture tab audio'}</button></div>
     <p class="sm mu" style="margin-top:6px">Choose the music tab and tick "Share tab audio".</p></div>`:''}
@@ -1855,7 +1861,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611250509',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611251138',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -2584,6 +2590,254 @@ const V28={
 setInterval(()=>{if(!document.hidden)V28.cd()},1000);
 setInterval(()=>{if(!document.hidden)V28.paint()},30000);
 
+/* ================= v29: spike orb (side header) + wave terrain (Focus Lock) ================= */
+const Orb={
+  smokeSprite(key,h0,h1){
+    this._sm=this._sm||{};if(this._sm[key])return this._sm[key];
+    const S=384,cv=document.createElement('canvas');cv.width=cv.height=S;const q=cv.getContext('2d');let sd=key.length*977+h0;const r=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2147483646};
+    q.globalCompositeOperation='lighter';
+    for(let i=0;i<60;i++){const x=S*(.15+.7*r()),y=S*(.15+.7*r()),rad=S*(.04+.12*r()),h=h0+r()*(h1-h0),gr=q.createRadialGradient(x,y,0,x,y,rad);
+      gr.addColorStop(0,`hsla(${h},80%,${42+r()*28}%,${.09+.12*r()})`);gr.addColorStop(1,'rgba(0,0,0,0)');q.fillStyle=gr;
+      q.save();q.translate(x,y);q.rotate(r()*6.28);q.scale(1+r()*1.8,.35+r()*.5);q.translate(-x,-y);q.beginPath();q.arc(x,y,rad,0,6.283);q.fill();q.restore()}
+    for(let i=0;i<16;i++){q.strokeStyle=`hsla(${h0+r()*(h1-h0)},75%,72%,${.07+.1*r()})`;q.lineWidth=1+r()*2.4;q.beginPath();let x=S*r(),y=S*r();q.moveTo(x,y);
+      for(let k=0;k<5;k++){x+=(r()-.5)*S*.3;y+=(r()-.5)*S*.3;q.quadraticCurveTo(x+(r()-.5)*44,y+(r()-.5)*44,x,y)}q.stroke()}
+    q.globalCompositeOperation='destination-in';const m=q.createRadialGradient(S/2,S/2,S*.08,S/2,S/2,S/2);m.addColorStop(0,'#fff');m.addColorStop(1,'rgba(255,255,255,0)');q.fillStyle=m;q.fillRect(0,0,S,S);
+    return this._sm[key]=cv;
+  },
+  init(v){
+    const N=190;let sd=41;const r=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2147483646};
+    const Sd=new Float32Array(N*3);for(let i=0;i<N*3;i++)Sd[i]=r();
+    v.ob={N,Sd,E:new Float32Array(N),yaw:.18,pit:-.12,vy:0,vp:0,press:0,
+      ptr:{down:false,fx:0,fy:0,x0:0,y0:0,px:0,py:0,t0:0},shocks:[],
+      shards:Array.from({length:8},()=>({a:r()*6.283,rad:.36+.12*r(),sz:.02+.03*r(),sp:(r()-.5)*.12,rot:r()*6.283,rs:(r()-.5)*.8,ph:r()*6.283,pts:[0,1,2,3].map(k=>[Math.cos(k*1.57+r()*.7)*(.6+.8*r()),Math.sin(k*1.57+r()*.7)*(.6+.8*r())])})),
+      sparks:Array.from({length:40},()=>({a:r()*6.283,rad:.2+.28*r(),ph:r()*6.283,sp:.8+r()*2.2}))};
+    this.bind(v);
+  },
+  bind(v){
+    const dr=document.getElementById('drawer');if(!dr||dr._orb)return;dr._orb=1;
+    const o=()=>v.ob,skip='button,a,input,select,textarea,label,.nav,.dprof,.dm-b,.msc,.dmusic';
+    const geo=e=>{const cv=document.getElementById('viz');if(!cv)return null;const r=cv.getBoundingClientRect();
+      return {fx:(e.clientX-(r.left+r.width/2))/r.width,fy:(e.clientY-(r.top+r.height/2))/r.height,inside:e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom}};
+    dr.addEventListener('pointerdown',e=>{
+      if(!document.getElementById('app').classList.contains('open'))return;
+      if(e.target.closest&&e.target.closest(skip))return;
+      const p=geo(e);if(!p||!p.inside||!o())return;
+      const s=o().ptr;s.down=true;s.fx=p.fx;s.fy=p.fy;s.x0=s.px=e.clientX;s.y0=s.py=e.clientY;s.t0=performance.now();
+      this.shock(v,p.fx,p.fy,.8);Viz.boost=Math.max(Viz.boost,.5);if(!Viz.raf)Viz.start();
+    },{passive:true});
+    dr.addEventListener('pointermove',e=>{
+      const b=o();if(!b||!b.ptr.down)return;const p=geo(e);if(!p)return;const s=b.ptr;
+      b.vy+=(e.clientX-s.px)*.016;b.vp-=(e.clientY-s.py)*.012;b.vy=Math.max(-7,Math.min(7,b.vy));b.vp=Math.max(-5,Math.min(5,b.vp));
+      s.px=e.clientX;s.py=e.clientY;s.fx=p.fx;s.fy=p.fy;
+    },{passive:true});
+    const up=e=>{
+      const b=o();if(!b||!b.ptr.down)return;const s=b.ptr;s.down=false;
+      const moved=Math.hypot(e.clientX-s.x0,e.clientY-s.y0),dt=performance.now()-s.t0;
+      if(moved<10&&dt<280){this.shock(v,s.fx,s.fy,1.15);Viz.pulse();try{buzz('tap')}catch(x){}}
+    };
+    dr.addEventListener('pointerup',up,{passive:true});dr.addEventListener('pointercancel',up,{passive:true});
+  },
+  shock(v,fx,fy,amp){
+    const b=v.ob;if(!b)return;
+    b.shocks.push({t0:(performance.now()-v.t0)/1000,fx,fy,ang:Math.atan2(-fy,fx),amp});if(b.shocks.length>5)b.shocks.shift();
+  },
+  draw(v){
+    const cv=document.getElementById('viz');if(!cv)return;
+    if(!v.ob)this.init(v);const o=v.ob;
+    const cw=cv.clientWidth;
+    if(cw>40){const tg=Math.min(v.q===2?560:420,Math.round(cw*Math.min(window.devicePixelRatio||1,2)));if(Math.abs(cv.width-tg)>8){cv.width=cv.height=tg}}
+    const g=cv.getContext('2d'),W=cv.width,c=W/2,now=performance.now(),t=(now-v.t0)/1000,t0=now,TAU=Math.PI*2;
+    if(v.q===1&&(v.skip^=1))return;
+    const dt=Math.min(.05,v.last?(now-v.last)/1000:.016);v.last=now;v.boost=Math.max(0,v.boost-dt*2.2);
+    /* ---- sound ---- */
+    let live=false;
+    if(v.an){v.tap();v.an.getByteFrequencyData(v.buf);for(let i=0;i<v.buf.length;i++)if(v.buf[i]>6){live=true;break}}
+    const FM=Viz.fm(),bpm=FM==='focus'?54:FM==='rest'?42:FM==='amb'?68:124,beat=t*bpm/60,ph=beat%1,bar=Math.floor(beat),
+      kick=Math.exp(-ph*5.5)*(bar%4===3?.7:1),snare=(bar%2===1)?Math.exp(-((beat%1)*7)):0,hat=Math.exp(-(((beat*2)%1))*10)*.5;
+    let bass=0,mid=0,hi=0;
+    if(live){let a=0,b=0,d=0;for(let i=1;i<6;i++)a+=v.buf[i];for(let i=6;i<30;i++)b+=v.buf[i];for(let i=30;i<70;i++)d+=v.buf[i];bass=a/5/255;mid=b/24/255;hi=d/40/255}
+    let K0=(live?bass*1.15:kick)+v.boost*.85,S0=(live?mid*1.2:snare*.8)+v.boost*.4,H0=(live?hi*1.5:hat)+v.boost*.3;
+    if(FM){const sc=FM==='focus'?1:FM==='rest'?.55:.8,st=Math.exp(-ph*4);
+      K0=(.58*st+(FM==='amb'?.2+.15*Math.sin(t*1.1):0)+(live?bass*.3:0))*sc+v.boost*.85;
+      S0=(.18+.12*Math.sin(t*2.2)+(live?mid*.3:0))*sc+v.boost*.4;
+      H0=(.15+(live?hi*.35:0))*sc+v.boost*.3}
+    if(v.lastKick!==bar&&K0>.55&&ph<.1){v.lastKick=bar;v.rip.push({t0:t})}
+    v.rip=v.rip.filter(r=>t-r.t0<1.1);
+    const night=!!document.documentElement.dataset.night,u=W/704;
+    /* ---- finger: tilt the ring like a coin, it springs back ---- */
+    const sp=o.ptr;o.press+=((sp.down?1:0)-o.press)*Math.min(1,dt*10);
+    o.yaw+=o.vy*dt;o.pit+=o.vp*dt;o.vy*=Math.exp(-dt*2);o.vp*=Math.exp(-dt*2);
+    const back=Math.min(1,dt*(sp.down?.3:1.3));
+    o.yaw+=((.18+.1*Math.sin(t*.4))-o.yaw)*back;o.pit+=((-.12+.06*Math.sin(t*.33))-o.pit)*back;
+    o.yaw=Math.max(-1.3,Math.min(1.3,o.yaw));o.pit=Math.max(-1.3,Math.min(1.3,o.pit));
+    const cyw=Math.cos(o.yaw),syw=Math.sin(o.yaw),cp=Math.cos(o.pit),spn=Math.sin(o.pit);
+    const r0=W*.29*(1+.03*K0),Lmax=W*.17*(FM==='focus'?.85:FM==='rest'?.65:FM==='amb'?.9:1);
+    const rot=(x,y,z)=>{const x1=x*cyw+z*syw,z1=-x*syw+z*cyw,y2=y*cp-z1*spn,z2=y*spn+z1*cp;return [x1,y2,z2]};
+    const px=c+sp.fx*W,py=c+sp.fy*W;
+    o.shocks=o.shocks.filter(s=>t-s.t0<1.6);
+    const hueX=x01=>night?(350+x01*55)%360:282-x01*72;   /* violet on the left, icy blue on the right */
+    /* ---- spikes ---- */
+    const N=o.N,step=v.q===2?1:2,E=o.E,Sd=o.Sd,NB=14,buckets=Array.from({length:NB*2},()=>[]);
+    const bx=new Float32Array(N),by=new Float32Array(N),tx=new Float32Array(N),ty=new Float32Array(N),mx=new Float32Array(N),my=new Float32Array(N);
+    for(let i=0;i<N;i+=step){
+      const th=i/N*TAU,ct=Math.cos(th),st=Math.sin(th),s0=Sd[i*3],s1=Sd[i*3+1],s2=Sd[i*3+2];
+      const B=rot(ct*r0,st*r0,0);const sB=1+B[2]/W*.2;
+      const Bx=c+B[0]*sB,By=c-B[1]*sB;
+      const pat=Math.abs(Math.sin(th*3+t*.25+1))*.55+Math.abs(Math.sin(th*7-t*.4))*.45;
+      const drive=s0<.34?K0:s0<.68?S0:H0;
+      let e=.03+(.06+pat*pat*(.38+1.1*drive))*(.45+.55*s1)+.035*Math.sin(t*(1.5+s2*3)+s1*TAU);
+      if(o.press>.02||sp.down){const d=Math.hypot(Bx-px,By-py);e+=Math.exp(-(d/(W*.2))*(d/(W*.2)))*1.0*o.press}
+      const phi=Math.atan2(c-By,Bx-c);
+      for(const s of o.shocks){let da=Math.abs(phi-s.ang);if(da>Math.PI)da=TAU-da;const f=(t-s.t0)*3.2;e+=s.amp*Math.exp(-((da-f)/.4)*((da-f)/.4))*Math.exp(-(t-s.t0)*1.3)}
+      E[i]+=(Math.min(1.6,e)-E[i])*Math.min(1,dt*(e>E[i]?24:7));
+      const len=Math.min(Lmax*1.25,W*.008+E[i]*Lmax);
+      const M=rot(ct*(r0+len*.5),st*(r0+len*.5),0),T=rot(ct*(r0+len),st*(r0+len),0);
+      bx[i]=Bx;by[i]=By;mx[i]=c+M[0]*(1+M[2]/W*.2);my[i]=c-M[1]*(1+M[2]/W*.2);tx[i]=c+T[0]*(1+T[2]/W*.2);ty[i]=c-T[1]*(1+T[2]/W*.2);
+      const x01=Math.max(0,Math.min(1,(Bx-(c-r0))/(2*r0)));
+      buckets[Math.min(NB-1,Math.floor(x01*NB))*2+(E[i]>.4?1:0)].push(i);
+    }
+    /* ---- draw ---- */
+    g.clearRect(0,0,W,W);g.lineCap='round';g.globalCompositeOperation='lighter';
+    /* nebula smoke: violet on the left, blue on the right, breathing with the bass */
+    const sv=night?this.smokeSprite('w',5,35):this.smokeSprite('v',262,296),sb=night?this.smokeSprite('w2',350,20):this.smokeSprite('b',205,235);
+    const smoke=(spr,a,rad,sz,al)=>{const x=c+Math.cos(a)*rad*W,y=c+Math.sin(a)*rad*W;g.save();g.translate(x,y);g.rotate(a*1.7+t*.05);g.globalAlpha=al;g.drawImage(spr,-sz/2,-sz/2,sz,sz);g.restore()};
+    const sk=.62+.3*K0;
+    smoke(sv,Math.PI*1.02+Math.sin(t*.07)*.15,.33,W*.62,sk);smoke(sv,Math.PI*.62+Math.sin(t*.09)*.15,.34,W*.5,sk*.8);smoke(sv,Math.PI*1.45,.36,W*.46,sk*.7);
+    smoke(sb,-.05+Math.sin(t*.08)*.15,.34,W*.62,sk);smoke(sb,.5+Math.sin(t*.06)*.15,.35,W*.5,sk*.8);smoke(sb,-.6,.36,W*.46,sk*.7);
+    g.globalAlpha=1;
+    /* thin concentric rings (tilt with the spikes) */
+    const lg=g.createLinearGradient(c-r0,0,c+r0,0);for(let k=0;k<=4;k++)lg.addColorStop(k/4,`hsla(${hueX(k/4)},90%,72%,.55)`);
+    const ringPts=(rr,dash,al,lw)=>{g.save();g.strokeStyle=lg;g.globalAlpha=al;g.lineWidth=u*lw;g.setLineDash(dash);g.lineDashOffset=-t*8;g.beginPath();
+      for(let k=0;k<=96;k++){const a=k/96*TAU,P=rot(Math.cos(a)*rr,Math.sin(a)*rr,0),s=1+P[2]/W*.2,x=c+P[0]*s,y=c-P[1]*s;k?g.lineTo(x,y):g.moveTo(x,y)}g.stroke();g.restore()};
+    ringPts(r0*.93,[],.5+.2*K0,1.2);ringPts(r0*1.05,[u*2,u*7],.45,1.6);ringPts(r0*.8,[u*1,u*9],.3,1.2);ringPts(r0*1.18,[],.18,1);
+    /* spikes: two fading segments + a bead at the tip */
+    const tips=[];
+    for(let b=0;b<NB*2;b++){const list=buckets[b];if(!list.length)continue;
+      const bin=b>>1,tier=b&1,h=hueX((bin+.5)/NB),L1=tier?78:64;
+      g.lineWidth=u*(tier?1.9:1.4);g.strokeStyle=`hsla(${h},100%,${L1}%,.95)`;g.beginPath();
+      for(const i of list){g.moveTo(bx[i],by[i]);g.lineTo(mx[i],my[i])}g.stroke();
+      g.lineWidth=u*1.1;g.strokeStyle=`hsla(${h},100%,${L1}%,.5)`;g.beginPath();
+      for(const i of list){g.moveTo(mx[i],my[i]);g.lineTo(tx[i],ty[i]);if(E[i]>.28)tips.push(tx[i],ty[i],h)}g.stroke();
+    }
+    for(let k=0;k<tips.length;k+=3){g.fillStyle=`hsla(${tips[k+2]},100%,88%,.95)`;g.beginPath();g.arc(tips[k],tips[k+1],u*1.7,0,TAU);g.fill()}
+    /* the tumbling orbit: a bright violet-to-blue loop crossing the centre */
+    o.ra=(o.ra||.35)+dt*(.5+.3*K0)+o.vp*dt*.2;o.rb=(o.rb||.9)+dt*(.36+.18*K0)+o.vy*dt*.25;o.rc=(o.rc||0)+dt*.24;
+    const RM=110,RR=W*.465,ax=Math.cos(o.ra),axs=Math.sin(o.ra),ay=Math.cos(o.rb),ays=Math.sin(o.rb),az=Math.cos(o.rc),azs=Math.sin(o.rc),RX=new Float32Array(RM+1),RY=new Float32Array(RM+1),RZ=new Float32Array(RM+1);
+    for(let k=0;k<=RM;k++){const a=k/RM*TAU;let x=Math.cos(a),y=Math.sin(a),z=0,q1;
+      q1=y*ax-z*axs;z=y*axs+z*ax;y=q1;q1=x*ay+z*ays;z=-x*ays+z*ay;x=q1;q1=x*az-y*azs;y=x*azs+y*az;x=q1;
+      RX[k]=c+x*RR;RY[k]=c-y*RR;RZ[k]=z}
+    for(let pass=0;pass<2;pass++)for(let k=0;k<RM;k++){const z=(RZ[k]+RZ[k+1])/2,d=(z+1)/2,x01=Math.max(0,Math.min(1,(RX[k]-(c-RR))/(2*RR))),h=hueX(x01);
+      g.strokeStyle=`hsla(${h},100%,${pass?82:62}%,${pass?.35+.5*d:.12+.1*d})`;g.lineWidth=u*(pass?1+2.2*d:5+5*d);g.beginPath();g.moveTo(RX[k],RY[k]);g.lineTo(RX[k+1],RY[k+1]);g.stroke()}
+    /* centre flare */
+    const fa=.45+.45*Math.min(1,K0),fr=W*(.05+.04*K0),fg=g.createRadialGradient(c,c,0,c,c,fr*2.4);
+    fg.addColorStop(0,`rgba(255,255,255,${fa})`);fg.addColorStop(.25,night?`rgba(255,150,80,${fa*.5})`:`rgba(180,150,255,${fa*.5})`);fg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=fg;g.fillRect(c-fr*2.4,c-fr*2.4,fr*4.8,fr*4.8);
+    const hl=g.createLinearGradient(c-W*.2,0,c+W*.2,0);hl.addColorStop(0,'rgba(255,255,255,0)');hl.addColorStop(.5,`rgba(255,255,255,${.5+.4*K0})`);hl.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle=hl;g.fillRect(c-W*.2,c-u*.8,W*.4,u*1.6);
+    const vl=g.createLinearGradient(0,c-W*.1,0,c+W*.1);vl.addColorStop(0,'rgba(255,255,255,0)');vl.addColorStop(.5,`rgba(255,255,255,${.4+.4*K0})`);vl.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle=vl;g.fillRect(c-u*.7,c-W*.1,u*1.4,W*.2);
+    g.fillStyle=`hsla(${hueX(.5)},100%,70%,${.18+.15*K0})`;g.fillRect(c-W*.34,c+W*.045,W*.68,u*.9);
+    /* sparkles + crystal shards */
+    for(const s of o.sparks){const al=Math.pow(Math.max(0,Math.sin(t*s.sp+s.ph)),6);if(al<.05)continue;const x=c+Math.cos(s.a+t*.02)*s.rad*W,y=c+Math.sin(s.a+t*.02)*s.rad*W,h=hueX((Math.cos(s.a)+1)/2),l=u*(2+6*al);
+      g.strokeStyle=`hsla(${h},100%,85%,${al*.9})`;g.lineWidth=u*.9;g.beginPath();g.moveTo(x-l,y);g.lineTo(x+l,y);g.moveTo(x,y-l);g.lineTo(x,y+l);g.stroke()}
+    for(const s of o.shards){const a=s.a+t*s.sp,push=Math.exp(-0)*0,x=c+Math.cos(a)*s.rad*W*(1+.03*K0),y=c+Math.sin(a)*s.rad*W*(1+.03*K0),sz=s.sz*W,h=hueX((Math.cos(a)+1)/2),r=s.rot+t*s.rs;
+      g.save();g.translate(x,y);g.rotate(r);g.scale(1,.55+.45*Math.cos(t*.6+s.ph));
+      g.beginPath();s.pts.forEach((p,k)=>k?g.lineTo(p[0]*sz,p[1]*sz):g.moveTo(p[0]*sz,p[1]*sz));g.closePath();
+      g.fillStyle=`hsla(${h},80%,70%,.07)`;g.fill();g.strokeStyle=`hsla(${h},100%,82%,${.35+.2*K0})`;g.lineWidth=u*1.1;g.stroke();g.restore()}
+    /* tap ripples + rings that radiate on the kick */
+    for(const s of o.shocks){const k=(t-s.t0)/1.6;g.strokeStyle=`hsla(${hueX(.5+s.fx)},100%,75%,${.6*(1-k)})`;g.lineWidth=u*(3*(1-k)+1);g.beginPath();g.arc(c+s.fx*W,c+s.fy*W,W*.5*k,0,TAU);g.stroke()}
+    for(const r of v.rip){const k=(t-r.t0)/1.1;g.strokeStyle=`hsla(${hueX(.5)},100%,80%,${.16*(1-k)})`;g.lineWidth=u*(1.5+2*(1-k));g.beginPath();g.arc(c,c,Math.min(r0*(1.05+.35*k),W*.49),0,TAU);g.stroke()}
+    v.fl=v.fl.filter(f=>t-f.t0<1.4);
+    for(const f of v.fl){const k=(t-f.t0)/1.4,e=1-k;
+      g.fillStyle=`hsla(${f.h},100%,60%,${.14*e*e})`;g.fillRect(0,0,W,W);
+      for(let j=0;j<3;j++){const kk=k-j*.12;if(kk<=0)continue;g.strokeStyle=`hsla(${(f.h+j*40)%360},100%,${68+j*6}%,${.75*(1-kk)})`;g.lineWidth=u*(6-j*1.4)*(1-kk*.5)+u;g.beginPath();g.arc(c,c,r0*.6+W*.7*kk,0,TAU);g.stroke()}}
+    g.globalCompositeOperation='source-over';
+    const cost=performance.now()-t0;v.ema=v.ema*.9+cost*.1;
+    if(v.q===2&&v.ema>11&&now-v.t0>2500)v.q=1;
+  }
+};
+
+/* ---------- wave terrain: the Focus Lock background (touch ripples + Pomodoro progress) ---------- */
+const Wave={
+  NX:40,NY:26,raf:0,cv:null,g:null,h:null,v:null,PX:null,PY:null,last:0,t0:0,sec:-1,mode:'',yaw:0,ptr:{down:false,x:0,y:0,nx:0},
+  start(){
+    this.stop();const cv=document.getElementById('flwave');if(!cv)return;
+    this.cv=cv;this.g=cv.getContext('2d');this.t0=performance.now();this.sec=-1;this.mode=Pomo.mode;
+    const n=this.NX*this.NY;this.h=new Float32Array(n);this.v=new Float32Array(n);this.PX=new Float32Array(n);this.PY=new Float32Array(n);
+    this.bind(cv);this.size();
+    const f=()=>{if(!this.cv)return;this.raf=requestAnimationFrame(f);const n=performance.now();if(n-this.last<30)return;this.draw(n)};
+    this.raf=requestAnimationFrame(f);
+  },
+  stop(){cancelAnimationFrame(this.raf);this.raf=0;this.cv=null},
+  size(){const cv=this.cv,d=Math.min(window.devicePixelRatio||1,1.5),w=Math.round(cv.clientWidth*d),h=Math.round(cv.clientHeight*d);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}},
+  bind(cv){
+    const hit=e=>{const r=cv.getBoundingClientRect(),sx=cv.width/r.width,x=(e.clientX-r.left)*sx,y=(e.clientY-r.top)*sx;this.ptr.x=x;this.ptr.y=y;this.ptr.nx=((e.clientX-r.left)/r.width-.5)*2;return [x,y]};
+    const poke=(x,y,amp)=>{let bi=-1,bd=1e12;const P=this.PX,Q=this.PY,n=P.length;for(let k=0;k<n;k++){const dx=P[k]-x,dy=Q[k]-y,d=dx*dx+dy*dy;if(d<bd){bd=d;bi=k}}
+      if(bi<0)return;const ci=bi%this.NX,cj=(bi/this.NX)|0;
+      for(let dj=-2;dj<=2;dj++)for(let di=-2;di<=2;di++){const i=ci+di,j=cj+dj;if(i<1||j<1||i>=this.NX-1||j>=this.NY-1)continue;this.h[j*this.NX+i]+=amp*Math.exp(-(di*di+dj*dj)/2.2)}};
+    cv.addEventListener('pointerdown',e=>{this.ptr.down=true;const [x,y]=hit(e);poke(x,y,1.3);try{cv.setPointerCapture(e.pointerId)}catch(x){}},{passive:true});
+    cv.addEventListener('pointermove',e=>{if(!this.ptr.down)return;const [x,y]=hit(e);poke(x,y,.32)},{passive:true});
+    const up=()=>{this.ptr.down=false};cv.addEventListener('pointerup',up,{passive:true});cv.addEventListener('pointercancel',up,{passive:true});
+  },
+  burst(j,amp,spread){const NX=this.NX,NY=this.NY;j=Math.max(1,Math.min(NY-2,j|0));for(let i=1;i<NX-1;i++){const k=Math.abs(i-NX/2)/(NX/2);this.h[j*NX+i]+=amp*(1-k*(1-spread))}},
+  draw(now){
+    this.size();const cv=this.cv,g=this.g,W=cv.width,H=cv.height,NX=this.NX,NY=this.NY,h=this.h,v=this.v;
+    const dt=Math.min(.06,this.last?(now-this.last)/1000:.033);this.last=now;const t=(now-this.t0)/1000;
+    const run=Pomo.running,dur=Pomo.dur(),rem=Pomo.remaining(),prog=Math.max(0,Math.min(1,1-rem/dur)),jm=prog*(NY-1);
+    const night=!!document.documentElement.dataset.night;
+    const hue=night?22:(Pomo.mode==='focus'?186:Pomo.mode==='short'?152:42);
+    /* timer events: every second a soft ripple at the progress ridge, every minute a full-width swell, mode change / finish a big one */
+    if(rem!==this.sec){
+      if(this.sec>=0){
+        if(rem===0||Pomo.mode!==this.mode){this.burst(jm,1.4,1);this.burst(Math.max(1,jm-4),.8,1)}
+        else if(rem%60===0){this.burst(jm,.9,1)}
+        else if(run){const k=Math.max(1,Math.min(NY-2,Math.round(jm)))*NX+(NX>>1);h[k]+=.3}
+      }
+      this.sec=rem;this.mode=Pomo.mode;
+    }
+    /* wave equation on the grid */
+    const c2=.22,damp=.984;
+    for(let j=1;j<NY-1;j++)for(let i=1;i<NX-1;i++){const k=j*NX+i;v[k]=(v[k]+c2*(h[k-1]+h[k+1]+h[k-NX]+h[k+NX]-4*h[k]))*damp}
+    for(let k=0;k<h.length;k++){h[k]+=v[k];if(h[k]>2.2)h[k]=2.2;else if(h[k]<-2.2)h[k]=-2.2}
+    /* projection (tilted plane, slight sway from your finger) */
+    this.yaw+=((this.ptr.down?this.ptr.nx*.22:0)-this.yaw)*Math.min(1,dt*3);
+    const AX=1.08,cA=Math.cos(AX),sA=Math.sin(AX),CAM=4.9,Fx=W*1.15,Fy=H*.78,cx=W/2,cy=H*.5,cz=Math.cos(this.yaw),sz=Math.sin(this.yaw),flow=run?t:t*.25;
+    const amp=run?1:.45;
+    for(let j=0;j<NY;j++){
+      const y=(j/(NY-1)-.5)*5.6,rj=j-jm,ridge=Pomo.mode==='focus'?.42*Math.exp(-(rj/1.5)*(rj/1.5)):.2*Math.exp(-(rj/2)*(rj/2));
+      for(let i=0;i<NX;i++){
+        const x=(i/(NX-1)-.5)*6.4,k=j*NX+i;
+        const base=amp*(.24*Math.sin(x*2.1+flow*.7+y*.6)*Math.cos(y*1.7-flow*.55)+.1*Math.sin(x*4.3-flow*1.1)*Math.sin(y*3.1+flow*.8))+ridge*(1+.2*Math.sin(flow*3+i*.45));
+        const z=(h[k]+base)*1.1;
+        const xr=x*cz-y*sz,yr=x*sz+y*cz,q1=yr*cA-z*sA,q2=yr*sA+z*cA,d=CAM+q1,s=1/d;
+        this.PX[k]=cx+xr*Fx*s;this.PY[k]=cy-q2*Fy*s;
+      }
+    }
+    g.clearRect(0,0,W,H);g.lineJoin='round';g.lineCap='round';
+    const PX=this.PX,PY=this.PY,fade=run?1:.6;
+    for(let j=0;j<NY;j++){
+      const done=j<=jm,near=1-j/(NY-1);
+      let al=(.16+.5*near)*fade;
+      let peak=0;for(let i=0;i<NX;i+=4)peak=Math.max(peak,Math.abs(h[j*NX+i]));
+      al=Math.min(.95,al+Math.min(.35,peak*.4));
+      g.strokeStyle=done?`hsla(${hue},100%,${58+near*14}%,${al})`:`hsla(${hue+78},55%,${46+near*10}%,${al*.7})`;
+      g.lineWidth=(done?1.5:1.1)*Math.min(2,W/390);
+      g.beginPath();for(let i=0;i<NX;i++){const k=j*NX+i;i?g.lineTo(PX[k],PY[k]):g.moveTo(PX[k],PY[k])}g.stroke();
+    }
+    /* depth lines */
+    g.lineWidth=1;
+    for(let i=0;i<NX;i+=3){
+      g.strokeStyle=`hsla(${hue},70%,62%,${.1*fade})`;g.beginPath();
+      for(let j=0;j<NY;j++){const k=j*NX+i;j?g.lineTo(PX[k],PY[k]):g.moveTo(PX[k],PY[k])}g.stroke();
+    }
+    /* the progress ridge: a bright line that travels toward the horizon as the session runs */
+    const jr=Math.max(0,Math.min(NY-1,Math.round(jm)));
+    g.strokeStyle=`hsla(${hue},100%,${night?72:86}%,${.95*fade})`;g.lineWidth=2.4*Math.min(2,W/390);g.shadowColor=`hsl(${hue},100%,60%)`;g.shadowBlur=14;
+    g.beginPath();for(let i=0;i<NX;i++){const k=jr*NX+i;i?g.lineTo(PX[k],PY[k]):g.moveTo(PX[k],PY[k])}g.stroke();g.shadowBlur=0;
+    /* finger marker */
+    if(this.ptr.down){g.strokeStyle=`hsla(${hue},100%,80%,.5)`;g.lineWidth=1.5;g.beginPath();g.arc(this.ptr.x,this.ptr.y,18+6*Math.sin(t*8),0,6.283);g.stroke()}
+  }
+};
+
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
 const SHIELD_COST=500,SHIELD_MAX=2,PR_XP=50,RING_XP={p:40,w:30};
@@ -2781,11 +3035,11 @@ const Flock={open:false,hid:0,last:'',
   show(){
     if(Pomo.mode!=='focus'&&!Pomo.running)Pomo.setMode('focus');
     if(Pomo.mode==='focus'){Pomo.lock=true;if(!Pomo.running)Pomo.toggle()}
-    this.open=true;$('#app').classList.add('flk');this.build();this.paint(true);
+    this.open=true;$('#app').classList.add('flk');this.build();this.paint(true);Wave.start();
   },
-  hide(){this.open=false;$('#app').classList.remove('flk');$('#flock').innerHTML='';this.last=''},
+  hide(){this.open=false;$('#app').classList.remove('flk');Wave.stop();$('#flock').innerHTML='';this.last=''},
   build(){
-    $('#flock').innerHTML=`<div class="fl-top"><span id="flMode"></span><span id="flNote"></span></div>
+    $('#flock').innerHTML=`<canvas id="flwave" aria-hidden="true"></canvas><div class="fl-top"><span id="flMode"></span><span id="flNote"></span></div>
      <div class="fl-clock" id="flClock" role="timer" aria-live="off">${['m1','m2',':','s1','s2'].map(x=>x===':'?'<i class="fl-c">:</i>':`<div class="fd" data-d="${x}"><span>0</span></div>`).join('')}</div>
      <div class="fl-snd" id="flSnd">${[['','Off'],...AMB].map(([k,n])=>`<button data-x="flamb" data-v="${k}" class="${(S.pomo.amb||'')===k?'on':''}">${n}</button>`).join('')}</div>
      <input type="range" class="fl-vol" min="0" max="1" step="0.01" value="${S.vol}" data-f="vol" aria-label="Volume">
@@ -3616,85 +3870,7 @@ const Viz={raf:0,an:null,tapped:new Set(),buf:null,t0:performance.now(),N:480,
   hue(deg){const H=this.HUES;for(let i=1;i<H.length;i++)if(deg<=H[i][0]){const a=H[i-1],b=H[i],k=(deg-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*k}return 180},
   fl:[],fm(){if(Pomo.running)return Pomo.mode==='focus'?'focus':'rest';return Snd.cur?'amb':null},flash(){const t=(performance.now()-this.t0)/1000;this.fl.push({t0:t,h:document.documentElement.dataset.night?15:165});this.boost=1;if(!this.raf&&$('#app').classList.contains('open'))this.start();let f=document.getElementById('fxflash');if(!f){f=document.createElement('div');f.id='fxflash';document.body.appendChild(f)}f.style.setProperty('--fx',document.documentElement.dataset.night?'#f59e0b':'#2dffb4');f.classList.remove('go');void f.offsetWidth;f.classList.add('go')},boost:0,pulse(){const t=(performance.now()-this.t0)/1000;this.rip.push({t0:t});this.boost=1;if(!this.raf&&$('#app').classList.contains('open'))this.start()},PK:[],HS:null,last:0,rip:[],lastKick:-1,q:2,ema:6,skip:0,HT:null,
   hueTable(){const n=document.documentElement.dataset.night?1:0;if(!this.HT||this.HN!==n){this.HN=n;this.HT=new Array(360);for(let d=0;d<360;d++)this.HT[d]=n?(350+d/360*55)%360:this.hue(d)}return this.HT},
-  draw(){
-    const cv=$('#viz');if(!cv)return;
-    /* size the bitmap to what the screen can actually show, so phones do less work */
-    const cw=cv.clientWidth;
-    if(cw>40){const tg=Math.min(this.q===2?560:420,Math.round(cw*Math.min(window.devicePixelRatio||1,2)));if(Math.abs(cv.width-tg)>8){cv.width=cv.height=tg}}
-    const g=cv.getContext('2d'),W=cv.width,c=W/2,now=performance.now(),t=(now-this.t0)/1000,N=this.q===2?360:220,t0=performance.now();
-    if(this.q===1&&(this.skip^=1))return;
-    const dt=Math.min(.05,this.last?(now-this.last)/1000:.016);this.last=now;this.boost=Math.max(0,this.boost-dt*2.2);
-    let live=false;
-    if(this.an){this.tap();this.an.getByteFrequencyData(this.buf);for(let i=0;i<this.buf.length;i++)if(this.buf[i]>6){live=true;break}}
-    const TAU=Math.PI*2,hash=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
-    /* a built-in groove (124 bpm) keeps it dancing; real sound from the app takes over when it plays */
-    const FM=Viz.fm(),bpm=FM==='focus'?54:FM==='rest'?42:FM==='amb'?68:124,beat=t*bpm/60,ph=beat%1,bar=Math.floor(beat),kick=Math.exp(-ph*5.5)*(bar%4===3?.7:1),snare=(bar%2===1)?Math.exp(-((beat%1)*7)):0,hat=Math.exp(-(((beat*2)%1))*10)*.5;
-    let bass=0,mid=0,hi=0;
-    if(live){let a=0,b=0,d=0;for(let i=1;i<6;i++)a+=this.buf[i];for(let i=6;i<30;i++)b+=this.buf[i];for(let i=30;i<70;i++)d+=this.buf[i];bass=a/5/255;mid=b/24/255;hi=d/40/255}
-    let K0=(live?bass*1.15:kick)+this.boost*.85,S0=(live?mid*1.2:snare*.8)+this.boost*.4,H0=(live?hi*1.5:hat)+this.boost*.3;
-    if(FM){/* focus rhythm: a steady, calm heartbeat; the sound generator only adds a little texture */
-      const sc=FM==='focus'?1:FM==='rest'?.55:.8,st=Math.exp(-ph*4);
-      K0=(.58*st+(FM==='amb'?.2+.15*Math.sin(t*1.1):0)+(live?bass*.3:0))*sc+this.boost*.85;
-      S0=(.18+.12*Math.sin(t*2.2)+(live?mid*.3:0))*sc+this.boost*.4;
-      H0=(.15+(live?hi*.35:0))*sc+this.boost*.3}
-    if(this.lastKick!==bar&&K0>.55&&ph<.1){this.lastKick=bar;this.rip.push({t0:t})}
-    this.rip=this.rip.filter(r=>t-r.t0<1.1);
-    const K=26;
-    if(this.PK.length!==K)this.PK=Array.from({length:K},(_,k)=>({c:k/K*TAU+(hash(k)-.5)*.2,w:.06+hash(k+3)*.1,ph:hash(k+7)*TAU,sp:1.2+hash(k+11)*3.2,hh:.55+hash(k+5)*.45,band:hash(k+17)}));
-    if(!this.HS||this.HS.length!==N)this.HS=new Float32Array(N);
-    const drift=t*(FM?.03:.06),tgt=new Float32Array(N);
-    for(let i=0;i<N;i++){
-      const th=i/N*TAU;let e=.05+.05*Math.sin(th*37+t*5);
-      for(const p of this.PK){
-        let d=Math.abs(th-(p.c+drift+Math.sin(t*.5+p.ph)*.07));if(d>Math.PI)d=TAU-d;
-        const w=p.w*(.85+.3*Math.sin(t*1.3+p.ph));if(d>=w)continue;
-        const drive=p.band<.34?K0:p.band<.68?S0:H0;
-        const h=p.hh*(.22+.35*(.5+.5*Math.sin(t*p.sp+p.ph))+.6*drive);
-        const v=h*Math.pow(1-d/w,1.25);if(v>e)e=v;
-      }
-      const flick=.7+.3*Math.sin(t*(9+hash(i)*14)+hash(i+5)*TAU);
-      tgt[i]=Math.min(1,e*2.2)*(.38+.62*hash(i*3+1))*(.82+.18*flick)+.02;
-    }
-    for(let i=0;i<N;i++){const d=tgt[i]-this.HS[i];this.HS[i]+=d*(d>0?Math.min(1,dt*30):Math.min(1,dt*7))}
-    /* everything has to fit inside the square: ring + tallest spike stays under 49% of the width */
-    const pulse=1+.012*K0,r0=W*.325*pulse,L=W*.155*(FM==='focus'?.8:FM==='rest'?.62:FM==='amb'?.9:1),u=W/704;
-    const HT=this.hueTable(),off=t*9,hue=i=>HT[((Math.floor(i/N*360+off))%360+360)%360];
-    g.clearRect(0,0,W,W);g.lineCap='round';g.globalCompositeOperation='lighter';
-    const gl=g.createRadialGradient(c,c,r0*.9,c,c,r0*1.5);gl.addColorStop(0,`rgba(120,90,255,${.05+.08*K0})`);gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(0,0,W,W);
-    for(const r of this.rip){const k=(t-r.t0)/1.1;g.strokeStyle=`hsla(${(t*30)%360},100%,70%,${.26*(1-k)})`;g.lineWidth=u*(2+3*(1-k));g.beginPath();g.arc(c,c,Math.min(r0*(1+.22*k),W*.49),0,TAU);g.stroke()}
-    if(this.q===2){g.lineCap='butt';for(let i=0;i<N;i+=3){
-      const a=-Math.PI/2+i/N*TAU,ln=W*.01+this.HS[i]*L*.85,h=hue(i),ca=Math.cos(a),sa=Math.sin(a);
-      g.strokeStyle=`hsla(${h},100%,58%,${.07+.05*K0})`;g.lineWidth=u*12;g.beginPath();g.moveTo(c+ca*(r0-u*6),c+sa*(r0-u*6));g.lineTo(c+ca*(r0+ln),c+sa*(r0+ln));g.stroke();
-    }g.lineCap='round'}
-    /* hair spikes: three fading segments per hair give a feathered taper without per-hair gradients (cheap on phones) */
-    for(let i=0;i<N;i++){
-      const a0=-Math.PI/2+i/N*TAU,ln=W*.008+this.HS[i]*L,h=hue(i),lw=u*(1+hash(i)*1.1)*(this.q===2?1:1.4),a1=a0+(hash(i*5)-.5)*.05*(ln/L),
-        x1=c+Math.cos(a0)*(r0-u*2),y1=c+Math.sin(a0)*(r0-u*2),
-        xa=c+Math.cos(a0+(a1-a0)*.4)*(r0+ln*.4),ya=c+Math.sin(a0+(a1-a0)*.4)*(r0+ln*.4),
-        xb=c+Math.cos(a0+(a1-a0)*.75)*(r0+ln*.75),yb=c+Math.sin(a0+(a1-a0)*.75)*(r0+ln*.75),
-        xc=c+Math.cos(a1)*(r0+ln),yc=c+Math.sin(a1)*(r0+ln);
-      g.lineWidth=lw;
-      g.strokeStyle=`hsla(${h},100%,84%,.95)`;g.beginPath();g.moveTo(x1,y1);g.lineTo(xa,ya);g.stroke();
-      g.strokeStyle=`hsla(${h},100%,64%,.6)`;g.beginPath();g.moveTo(xa,ya);g.lineTo(xb,yb);g.stroke();
-      g.strokeStyle=`hsla(${h},100%,58%,.24)`;g.lineWidth=lw*.8;g.beginPath();g.moveTo(xb,yb);g.lineTo(xc,yc);g.stroke();
-    }
-    /* thin neon ring: glow drawn as wider translucent strokes instead of shadowBlur, which is very slow on phones */
-    const seg=72,fl=K0;
-    for(let i=0;i<seg;i++){
-      const a0=-Math.PI/2+i/seg*TAU,a1=a0+TAU/seg*1.1,h=hue(i/seg*N);
-      g.strokeStyle=`hsla(${h},100%,60%,${.16+.12*fl})`;g.lineWidth=u*(15+10*fl);g.beginPath();g.arc(c,c,r0,a0,a1);g.stroke();
-      g.strokeStyle=`hsla(${h},100%,70%,${.3+.2*fl})`;g.lineWidth=u*7;g.beginPath();g.arc(c,c,r0,a0,a1);g.stroke();
-      g.strokeStyle=`hsla(${h},100%,${88+fl*8}%,1)`;g.lineWidth=u*(3+1.4*fl);g.beginPath();g.arc(c,c,r0,a0,a1);g.stroke();
-    }
-    this.fl=this.fl.filter(f=>t-f.t0<1.4);
-    for(const f of this.fl){const k=(t-f.t0)/1.4,e=1-k;
-      g.fillStyle=`hsla(${f.h},100%,60%,${.16*e*e})`;g.fillRect(0,0,W,W);
-      for(let j=0;j<3;j++){const kk=k-j*.12;if(kk<=0)continue;g.strokeStyle=`hsla(${(f.h+j*40)%360},100%,${68+j*6}%,${.75*(1-kk)})`;g.lineWidth=u*(6-j*1.4)*(1-kk*.5)+u;g.beginPath();g.arc(c,c,r0*.6+W*.7*kk,0,TAU);g.stroke()}}
-    g.globalCompositeOperation='source-over';
-    /* watch the frame cost and step down quality if the device is struggling */
-    const cost=performance.now()-t0;this.ema=this.ema*.9+cost*.1;
-    if(this.q===2&&this.ema>11&&now-this.t0>2500)this.q=1;
-  }
+  draw(){return Orb.draw(this)}
 };
 /* ---------- audio ---------- */
 let AC=null;
@@ -5117,7 +5293,7 @@ document.addEventListener('focusout',()=>{if(Sync.needRender)setTimeout(()=>{con
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)&&!window.__STANDALONE__){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
-window.__dayforge={V28,Lock,Edit,WB,Hold,Rcpt,receiptData,receiptCanvas,Tags,taskState,winFor,scoreFor,disciplineDelta,Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
+window.__dayforge={Flock,Wave,Orb,V28,Lock,Edit,WB,Hold,Rcpt,receiptData,receiptCanvas,Tags,taskState,winFor,scoreFor,disciplineDelta,Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
   setDate(d){vd=sod(d);follow=false;render(true)}};
 })();
 </script>
