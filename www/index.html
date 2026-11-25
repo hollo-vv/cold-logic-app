@@ -1112,6 +1112,11 @@ html[data-tags] .tl .row.now .rb{flex-wrap:wrap;row-gap:4px}
 html[data-tags] .tl .row.now .bt{flex:1 1 100%}
 html[data-tags] .tl .row.now .cdn{font-size:13px}
 html[data-tags] .tl .row.now .now-tag{white-space:nowrap}
+/* clock: hour hand (short, thick, accent) + minute hand (long, thin) + centre pin */
+.ring.dial::before{height:25%;width:1.5px;background:rgba(255,255,255,.7)}
+.ring.dial .hh{position:absolute;left:50%;top:50%;width:3.5px;height:15%;border-radius:3px;background:var(--cy,#22d3ee);box-shadow:0 0 6px rgba(34,211,238,.7);transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(var(--hh,0deg));pointer-events:none}
+.ring.dial .hc{position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);pointer-events:none}
+.ring.dial::after{background:radial-gradient(circle,rgba(255,255,255,.07),rgba(255,255,255,0) 70%),repeating-conic-gradient(rgba(255,255,255,.34) 0 1.6deg,transparent 1.6deg 30deg)}
 </style>
 </head>
 <body>
@@ -1850,7 +1855,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611250319',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611250509',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -2561,7 +2566,10 @@ const V28={
       st.textContent='STATUS: '+t;
     }
     const rg=document.querySelector('.ring.dial');
-    if(rg)rg.style.setProperty('--hr',(new Date().getMinutes()*6)+'deg');
+    if(rg){const n=new Date();
+      if(!rg.querySelector('.hh'))rg.insertAdjacentHTML('beforeend','<i class="hh"></i><i class="hc"></i>');
+      rg.style.setProperty('--hr',(n.getMinutes()*6)+'deg');
+      rg.style.setProperty('--hh',((n.getHours()%12)*30+n.getMinutes()/2)+'deg');}
     this.cd();
   },
   cd(){
