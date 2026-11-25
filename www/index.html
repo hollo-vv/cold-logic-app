@@ -966,6 +966,152 @@ html[data-tags] .tick.holding{transform:none;background:rgba(227,230,235,.12)}
 .row.fut,.card.ex.fut,.logrow.fut{opacity:.4}
 .fut .del{display:none}
 .hol{width:26px;height:26px;border-radius:50%;border:1.5px solid #6b7280;display:block;justify-self:center}
+/* v28: Day screen redesign */
+/* ---- header ---- */
+.dh{display:flex;align-items:center;gap:18px;padding:2px 2px 14px}
+.dh-r{min-width:0}
+.dh-pct{display:flex;align-items:baseline;line-height:1}
+.dh-pct b{font:800 52px/1 var(--sans);letter-spacing:-.02em;color:#fff;font-variant-numeric:tabular-nums}
+.dh-pct small{font-size:28px;font-weight:700;color:#fff;margin-left:2px}
+.dh-l{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:#8d97ab;text-transform:uppercase;margin-top:8px;line-height:1.2}
+.dh-l+.dh-l{margin-top:3px}
+.dh-chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.dh-chips .chip{height:26px;font-size:12px;padding:0 9px}
+.dh-chips .chip svg{width:14px;height:14px}
+.ring.dial circle{stroke-width:7}
+.ring.dial .rv{display:none}
+.ring.dial::after{content:"";position:absolute;inset:25%;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:radial-gradient(circle,rgba(255,255,255,.07),rgba(255,255,255,0) 70%),repeating-conic-gradient(rgba(255,255,255,.34) 0 1.6deg,transparent 1.6deg 30deg);-webkit-mask:radial-gradient(circle,transparent 0 60%,#000 62%);mask:radial-gradient(circle,transparent 0 60%,#000 62%)}
+.ring.dial::before{content:"";position:absolute;left:50%;top:50%;width:2px;height:20%;border-radius:2px;background:rgba(255,255,255,.55);transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(var(--hr,0deg))}
+
+/* ---- habits band ---- */
+.card.qd{background:none;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;-webkit-backdrop-filter:none;backdrop-filter:none;padding:13px 2px 14px;margin-bottom:0}
+.card.qd .eyebrow{font-size:11.5px;letter-spacing:.18em;color:#a3adc0}
+.card.qd .mrow button{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#a3adc0;display:inline-flex;align-items:center;gap:2px}
+.card.qd .mrow button svg{width:14px;height:14px}
+.qd-row{gap:10px;padding:12px 2px 2px}
+.qd-b{flex-direction:row;gap:7px;min-width:0;height:38px;padding:0 14px 0 10px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--hc) 65%,transparent);background:color-mix(in srgb,var(--hc) 14%,transparent);color:#eef1f7;flex:none;align-items:center}
+.qd-b span,.qd-b.on span{width:auto;height:auto;border:0;border-radius:0;background:none;box-shadow:none;font-size:17px;display:grid;place-items:center}
+.qd-b.on span{color:var(--hc)}
+.qd-b i{font-size:14px;font-weight:600;max-width:none;color:inherit}
+.qd-b.on{background:color-mix(in srgb,var(--hc) 30%,transparent);border-color:var(--hc);box-shadow:0 0 14px -4px var(--hc)}
+
+/* ---- map timeline ---- */
+.tlt{display:flex;align-items:center;justify-content:space-between;padding:16px 4px 8px}
+.tlt .eyebrow{font-size:11.5px;letter-spacing:.2em;color:#a3adc0}
+.tlt .tlh{padding:0}
+.tlx{position:relative;margin-bottom:6px}
+.tlwm{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:6px 0;pointer-events:none;overflow:hidden;z-index:0}
+.tlwm span{font:900 92px/.9 var(--sans);letter-spacing:-.04em;color:rgba(255,255,255,.04);white-space:nowrap;margin-left:-6px}
+.card.tl{position:relative;z-index:1;background:none;border:0;-webkit-backdrop-filter:none;backdrop-filter:none;padding:2px 0;margin-bottom:0;overflow:visible}
+
+.tl .row{grid-template-columns:54px 30px minmax(0,1fr);column-gap:8px;padding:6px 4px 6px 0;margin-bottom:0;border-radius:0;background:none;box-shadow:none}
+.tl .row.now{background:none;box-shadow:none;padding:8px 4px 8px 0}
+.tl .row::before{left:76px;top:0;bottom:0;width:2px;background:linear-gradient(#3ba7ff,#22d3ee);opacity:.8;box-shadow:0 0 8px rgba(59,167,255,.35)}
+.tl .row:first-child::before{top:50%}
+.tl .row:last-child::before{bottom:50%}
+.tl .row:not(.done):not(.now):not(.skipped)::before{background:none;width:0;box-shadow:none;opacity:1;border-left:2px dashed rgba(150,165,190,.35)}
+
+.tl .row .when{grid-column:1;grid-row:1;display:flex;flex-direction:column;gap:3px;text-align:right;line-height:1.1}
+.tl .row .when b{font-size:13px;color:#d9dee8;font-weight:600}
+.tl .row .when i{font-style:normal;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12px;color:#7d869a}
+.tl .row.now .when b{color:#fff;font-weight:800}
+
+/* node: the tick (or the dot for rows without a tick) */
+.tl .row .dot{display:none;grid-column:2;grid-row:1;width:22px;height:22px;border:2px solid #667085;background:transparent;box-shadow:none;animation:none;position:relative;justify-self:center}
+.tl .row.nt .dot{display:block}
+.tl .row .tick,.tl .row .hol{grid-column:2;grid-row:1;justify-self:center}
+.tl .row .tick{width:24px;height:24px;border:2px solid #667085;background:transparent;color:transparent;box-shadow:none}
+.tl .row .tick svg{width:14px;height:14px}
+.tl .row .hol{width:22px;height:22px;border:2px solid #667085}
+.tl .row .tick:not(.fx)::after{content:"";position:absolute;inset:-9px;border-radius:50%}
+.tl .row.now .tick,.tl .row.now .dot{border-color:#3ba7ff;box-shadow:0 0 0 4px rgba(59,167,255,.2),0 0 14px rgba(59,167,255,.6);background:radial-gradient(circle,#3ba7ff 0 36%,transparent 40%);animation:none}
+html:not([data-tags]) .tl .row.done .tick,.tl .row.done .dot,.tl .row.now.done .dot{background:#3aa7f2;border-color:#7ec8ff;color:#fff;box-shadow:0 0 12px rgba(59,167,255,.6)}
+.tl .row.done .dot::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+html:not([data-tags]) .tl .row.skipped .tick,.tl .row.skipped .dot{background:#e0a24a;border-color:#f3c070;box-shadow:0 0 10px rgba(224,162,74,.5)}
+.tl .row.skipped .tick svg{display:none}
+html:not([data-tags]) .tl .row.held.done .tick,.tl .row.held.done .dot{background:transparent;border-color:#cfd3da;color:#e3e6eb;box-shadow:none}
+.tl .row.held.done .dot::after{border-color:#e3e6eb}
+
+/* sleep / system lock */
+.tl .row.sysl .tick{border:1.5px dashed #6b7280;border-radius:7px;background:rgba(255,255,255,.03)}
+.tl .row.sysl .tick .i:nth-child(2){color:#8b93a5;transform:none;width:13px;height:13px;stroke-width:2}
+.tl .row.sysl.done .tick{border-radius:50%;border-style:solid}
+.tl .row.sysl.done .tick .i:nth-child(2){display:none}
+.tl .row.sysl .rb b{color:#8b93a5}
+.tl .sl{font-family:var(--mono);font-size:11px;color:#6d7587;letter-spacing:.04em}
+
+/* body */
+.tl .row .rb{grid-column:3;grid-row:1;padding:0;min-width:0;display:flex;align-items:center;gap:10px;position:relative}
+.tl .row .rb b{font-size:16px;font-weight:500;color:#aeb6c8;display:block}
+.tl .row.done:not(.held) .rb b{color:#eef1f7;text-decoration:none}
+.tl .row.now .rb b{color:#fff;font-weight:700}
+.tl .row.sysl .rb b{font-weight:500}
+.tl .bt{flex:1;min-width:0}
+.tl .bt small{display:block;color:#8d97ab;font-size:12.5px;margin-top:2px}
+.tl .bt small.sl{color:#6d7587;font-size:11px}
+.tl .row .now-tag{font-size:10px;letter-spacing:.14em;color:#6cc4ff;font-weight:600;text-transform:uppercase;margin-top:3px}
+.tl .row.now .now-tag{display:block}
+.tl .ico{display:none;width:32px;height:32px;border-radius:10px;place-items:center;flex:none;color:var(--cy);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.tl .ico svg{width:17px;height:17px}
+.tl .row.crd .ico,.tl .row.now .ico{display:grid}
+.tl .ck{display:none;color:#6cc4ff;flex:none}
+.tl .ck svg{width:18px;height:18px;stroke-width:2.6}
+.tl .row.done .ck{display:grid}
+.tl .chv{color:var(--mu);flex:none;display:grid}
+.tl .chv svg{width:18px;height:18px}
+.tl .row.done .chv{display:none}
+.tl .cdn{display:none;font-family:var(--mono);font-weight:800;font-size:15px;color:#7fd0ff;text-shadow:0 0 10px rgba(99,179,255,.6);white-space:nowrap;flex:none;font-variant-numeric:tabular-nums}
+.tl .cdn small{font-size:10px;margin-left:3px;letter-spacing:.1em;font-weight:700}
+.tl .row.now .cdn{display:block}
+
+/* cards: workout, classes, and the active waypoint */
+.tl .row.crd .rb,.tl .row.now .rb{border:1px solid rgba(130,155,205,.22);background:rgba(20,27,42,.7);border-radius:14px;padding:11px 12px}
+.tl .row.now .rb{border-color:rgba(99,179,255,.75);background:linear-gradient(90deg,rgba(139,92,246,.22),rgba(34,211,238,.1));box-shadow:0 0 14px -5px rgba(99,179,255,.6)}
+.tl .gb{flex:1;min-width:0}
+.tl .gb .gl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8d97ab;margin-bottom:4px;font-weight:600}
+.tl .crd .cl{margin:0;padding:0;background:none;border-radius:0;gap:10px}
+.tl .crd .cl b{font-size:15px;font-weight:600;color:#eef1f7}
+.tl .crd .cl small{color:#8d97ab;font-size:12.5px;line-height:1.3}
+.tl .crd .clw+.clw{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)}
+.tl .crd.done .cl .chev{display:none}
+.tl .row.nt:not(.crd) .rb .cl.free{margin:0;padding:0;background:none}
+.tl.ed .row .rb{padding-right:40px}
+.tl .row .pen{right:6px;top:50%;transform:translateY(-50%)}
+
+/* tag mode: keep the tag at the right, the dot is the node */
+html[data-tags] .tl .row{grid-template-columns:54px 30px minmax(0,1fr) auto}
+html[data-tags] .tl .row .dot{display:block}
+html[data-tags] .tl .row .tick,html[data-tags] .tl .row .hol{grid-column:4}
+html[data-tags] .tl .row .tick:not(.fx)::after{display:none}
+html[data-tags] .tl .row .tick .i:nth-child(2){display:none}
+
+/* ---- extras ---- */
+.xt{margin-top:4px;padding:14px 2px 6px;border-top:1px solid var(--line);margin-bottom:12px}
+.xt .eyebrow{font-size:11.5px;letter-spacing:.18em;color:#a3adc0}
+.xt .row2{align-items:stretch}
+.wpin{position:relative;flex:1;min-width:0}
+.wpin>svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#8d97ab;pointer-events:none}
+.wpin input{padding-left:40px;height:50px;border-radius:14px;background:rgba(20,27,42,.7)}
+.xt .btn{height:50px;border-radius:14px;padding:0 20px;letter-spacing:.08em;font-weight:700;text-transform:uppercase;font-size:14px;box-shadow:0 0 18px -5px var(--acc)}
+.xt .btn svg{width:16px;height:16px}
+.tl .cdn small{display:inline;margin:0 0 0 3px}
+.tl .row .now-tag{font-size:9.5px;letter-spacing:.1em}
+.tl .row .now-tag{font-size:9px;letter-spacing:.06em;white-space:nowrap}
+.tl .cdn{font-size:14px}
+/* tag mode: restore the tag look over the node styling */
+html[data-tags] .tl .row .tick,html[data-tags] .tl .row.now .tick,html[data-tags] .tl .row.done .tick,html[data-tags] .tl .row.skipped .tick,html[data-tags] .tl .row.sysl .tick{width:auto;min-width:46px;height:auto;min-height:36px;padding:4px 2px;border:0;border-radius:6px;background:none;box-shadow:none;color:var(--mu);font:600 10px/1.35 var(--mono);letter-spacing:.02em;white-space:pre;text-align:center;justify-self:end}
+html[data-tags] .tl .row .tick[data-st=EXEC],html[data-tags] .tl .row .tick[data-st=DONE],html[data-tags] .tl .row .tick[data-st=LOCK]{color:#e3e6eb}
+html[data-tags] .tl .row .tick[data-st=LATE]{color:#f59e0b}
+html[data-tags] .tl .row .tick[data-st=VOID]{color:#ef4444}
+html[data-tags] .tl .row .tick[data-st=PEND]{color:var(--mu2)}
+html[data-tags] .tl .row .now-tag{white-space:normal}
+.tl .bt{overflow:hidden}
+@media(max-width:380px){.tl .row .now-tag{white-space:normal;letter-spacing:.05em}}
+html[data-tags] .tl .row.now .ico{display:none}
+html[data-tags] .tl .row.now .rb{flex-wrap:wrap;row-gap:4px}
+html[data-tags] .tl .row.now .bt{flex:1 1 100%}
+html[data-tags] .tl .row.now .cdn{font-size:13px}
+html[data-tags] .tl .row.now .now-tag{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1356,7 +1502,7 @@ function sync(){
   $$('[data-xpbar]').forEach(e=>e.style.setProperty('--p',(S.xp%LV)/LV*100));
   $('#avTop').src=S.pic||IMG.profile;
   const dp=$('.dprof');if(dp){$('img',dp).src=S.pic||IMG.profile;$('b',dp).textContent=S.name||'Set your name';$('small',dp).textContent='Level '+level()+' · '+S.xp+' XP'}
-  markNow();
+  markNow();V28.paint();
   save();
 }
 function markNow(){
@@ -1390,61 +1536,11 @@ function countdown(e){
   return {t:'in '+h+'h '+m+'m',c:'soon'};
 }
 
-function rowHtml(it,wd){
-  const [s,e]=itemTimes(it),sm=mins(s);let em=e?mins(e):sm+30;
-  let when;
-  if(it.pre&&e)when=`<b>${it.pre} ${fmtT(e)}</b>`;
-  else when=`<b>${fmtT(s)}</b>`+(e&&!it.pre?fmtT(e).replace(/^/,'→ '):'');
-  let body='',tick='',cls='row',attrs='';
-  if(it.kind==='workout'){
-    const w=workoutFor(wd);
-    if(w.x.length){
-      body=`<b>${esc(it.n)}</b><small>${esc(w.t)} · <span data-wprog>0/${w.x.length}</span> done · tap to open</small>`;
-      tick=`<div class="mini-prog"><span data-wprog>0/${w.x.length}</span></div>`;cls+=' link';attrs=`data-go="workout" data-wrow`;
-    }else{
-      body=`<b>${esc(it.n)}</b><small>Rest day: stretch, walk, hydrate</small>`;tick=tickBtn('wrest');attrs='data-task="wrest"';
-    }
-  }else if(GROUPS[it.kind]){
-    const en=entriesFor(wd,GROUPS[it.kind]);
-    if(en.length){
-      body=`<b>${esc(it.n)}</b>`+en.map(x=>{const key='d'+it.kind+':'+x.c,open=openNotes.has(key),np=pendingNotes(x.c);return `<div class="clw"><div class="cl tap" data-act="notes" data-key="${esc(key)}" role="button" tabindex="0" aria-expanded="${open}"><span class="ty ${esc(x.t)}">${esc(x.t)}</span><div class="grow"><b style="font-size:15px;text-decoration:none">${esc(cname(x.c))}</b><small>${esc(x.c)} · Room ${esc(x.r)} · ${hrsLabel(x.hrs)}</small></div>${np?`<span class="nbadge">${np}</span>`:''}<span class="chev ${open?'o':''}">${ic('right')}</span></div>${open?notesPanel(x.c):''}</div>`}).join('');
-      tick=tickBtn(it.kind);attrs=`data-task="${it.kind}"`;
-    }else{body=`<b>${esc(it.n)}</b><div class="cl free">Free period</div>`}
-  }else{body=`<b>${esc(it.n)}</b>`;tick=tickBtn(it.id);attrs=`data-task="${it.id}"`}
-  const pen=((it.kind==='normal'||it.kind==='workout')&&Lock.penOk(it))?`<button class="pen" data-act="rtedit" data-id="${esc(it.id)}" aria-label="Edit or reschedule ${esc(it.n)}">${ic('pencil')}</button>`:'';
-  const swh=(attrs.indexOf('data-task')>=0||attrs.indexOf('data-wrow')>=0)?`<div class="swh r">${ic('check')}Complete</div><div class="swh l">Skip${ic('right')}</div>`:'';
-  return `<div class="${cls}" ${attrs} data-s="${sm}" data-e="${em}">${swh}<div class="when">${when}</div><div class="dot"></div><div class="rb"><div class="now-tag">Now</div>${body}${pen}</div>${tick||'<span></span>'}</div>`;
-}
 
 function addCard(title,label,tab,day){
   return `<section class="card addcard"><b>${esc(title)}</b><button class="btn" data-act="addfor" data-k="${tab}" data-d="${day||''}">${ic('plus')}${esc(label)}</button></section>`;
 }
 const hasClasses=()=>Object.keys(S.tt||{}).some(d=>Object.values(S.tt[d]||{}).some(c=>c&&c.c));
-function vDay(){
-  const wd=vd.getDay(),k=iso(vd),ne=nextExam();
-  let h=dateNav();
-  h+=`<div class="stagger">`;
-  h+=`<section class="card hero">${ringHtml(150)}<div class="grow"><div class="eyebrow">${DAYS[wd]}</div><div class="h2">${greeting()}</div>
-  <p class="mu sm" style="margin-top:6px"><span data-done>0</span> of <span data-total>0</span> done · ${STREAK_PCT}% keeps your streak</p>
-  <div class="stats"><span class="chip streak">${ic('flame')}<span data-streak>0</span> day streak</span><span class="chip" style="color:var(--am)">${ic('bolt')}<span data-xp>0</span> XP</span></div></div></section>`;
-  h+=Sleep.banner();h+=readyCard();
-  h+=`<section class="card"><div class="mrow"><span class="eyebrow">Level <b style="font-family:var(--serif);font-size:20px;color:var(--tx)" data-lv>1</b></span><span class="sm mu" data-xpin></span></div><div class="xpbar" data-xpbar><i></i></div></section>`;
-  h+=shieldCard();h+=sundayBanner();h+=habitsToday();
-  if(!S.name)h+=`<section class="card banner"><div class="grow"><b>Make it yours</b><p class="mu sm">Add your name and photo.</p></div><button class="btn sm" data-go="profile">Set up</button></section>`;
-  if(ne){const c=countdown(ne.e);h+=`<section class="card banner" data-go="exams" style="cursor:pointer">${ic('exam')}<div class="grow"><b>${esc(ne.e.name)}</b><p class="mu sm">${esc(ne.e.subject||'')}${ne.e.subject?' · ':''}${esc(ne.e.date)} ${ne.e.time?fmtT(ne.e.time):''}</p></div><span class="cd ${c.c}">${c.t}</span></section>`}
-  if(wd!==0&&!S.routine.length)h+=addCard('Your schedule is empty','Add Task','rt');
-  if(wd===0){
-    h+=`<section class="card empty"><b>Sunday is free</b>No fixed schedule today. Add your own tasks below and tick them off.</section>`;
-  }else{
-    if(S.routine.length)h+=`<section class="card tl" style="padding:12px 8px">${Lock.mode()==='future'?'':editToggle()}${routineSorted().map(it=>rowHtml(it,wd)).join('')}</section>`;
-  }
-  const ex=S.extras[k]||[];
-  h+=`<section class="card"><div class="eyebrow" style="margin-bottom:10px">${wd===0?'Your tasks':'Extra tasks for this day'}</div>
-    ${ex.map(x=>`<div class="logrow" data-task="${x.id}">${tickBtn(x.id)}<div class="grow"><b>${esc(x.label)}</b></div><button class="icon-btn del" data-act="delx" data-id="${x.id}" aria-label="Delete task">${ic('trash')}</button></div>`).join('')}
-    <form class="row2" data-form="extra" style="margin-top:${ex.length?10:0}px"><input name="label" placeholder="Add a task…" maxlength="80" required aria-label="New task"><button class="btn sm" type="submit">${ic('plus')}Add</button></form></section>`;
-  h+=`</div>`;
-  return h;
-}
 
 function vAcad(){
   const wd=vd.getDay();let h=dateNav()+`<div class="stagger">`;h+=focusCard();
@@ -1754,7 +1850,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611241344',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611250319',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -2379,6 +2475,107 @@ document.addEventListener('click',e=>{
   Edit.on=!Edit.on;render(true);
 });
 
+/* ================= v28: Day screen redesign (compact header, habit chips, map timeline) ================= */
+P.target='<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".9"/>';
+const WMARK=['REMEMBER','WHO','YOU','WANTED','TO','BE'];
+const dayWM=()=>`<div class="tlwm" aria-hidden="true">${WMARK.map(w=>`<span>${w}</span>`).join('')}</div>`;
+
+function rowHtml(it,wd){
+  const [s,e]=itemTimes(it),sm=mins(s);let em=e?mins(e):sm+30;
+  const when=(it.pre&&e)?`<b>${fmtT(e)}</b><i>${esc(it.pre)}</i>`:`<b>${fmtT(s)}</b>`+(e?`<i>${fmtT(e)}</i>`:'');
+  const nowT=`<span class="now-tag">Now · Active waypoint</span>`,cdn=`<span class="cdn" data-cdn></span>`;
+  const ck=`<span class="ck">${ic('check')}</span>`,chv=`<span class="chv">${ic('right')}</span>`;
+  let body='',tick='',cls='row',attrs='';
+  if(it.kind==='workout'){
+    const w=workoutFor(wd);
+    if(w.x.length){
+      body=`<span class="ico">${ic('work')}</span><div class="bt"><b>${esc(it.n)}</b>${nowT}<small>${esc(w.t)} · <span data-wprog>0/${w.x.length}</span> done</small></div>${ck}${chv}${cdn}`;
+      cls+=' link crd nt';attrs=`data-go="workout" data-wrow`;
+    }else{
+      body=`<span class="ico">${ic('work')}</span><div class="bt"><b>${esc(it.n)}</b>${nowT}<small>Rest day: stretch, walk, hydrate</small></div>${cdn}`;
+      tick=tickBtn('wrest');attrs='data-task="wrest"';
+    }
+  }else if(GROUPS[it.kind]){
+    const en=entriesFor(wd,GROUPS[it.kind]);
+    if(en.length){
+      const one=en.length===1;
+      body=`<div class="gb">${nowT}${one?'':`<b class="gl">${esc(it.n)}</b>`}`+en.map(x=>{const key='d'+it.kind+':'+x.c,open=openNotes.has(key),np=pendingNotes(x.c);return `<div class="clw"><div class="cl tap" data-act="notes" data-key="${esc(key)}" role="button" tabindex="0" aria-expanded="${open}"><span class="ty ${esc(x.t)}">${esc(x.t)}</span><div class="grow"><b style="font-size:15px;text-decoration:none">${one?esc(it.n)+': ':''}${esc(cname(x.c))}</b><small>${esc(x.c)} · Room ${esc(x.r)} · ${hrsLabel(x.hrs)}</small></div>${np?`<span class="nbadge">${np}</span>`:''}<span class="chev ${open?'o':''}">${ic('right')}</span></div>${open?notesPanel(x.c):''}</div>`}).join('')+`</div>${ck}${cdn}`;
+      tick=tickBtn(it.kind);attrs=`data-task="${it.kind}"`;cls+=' crd grp';
+    }else{body=`<b>${esc(it.n)}</b><div class="cl free">Free period</div>`;cls+=' nt'}
+  }else{
+    const sy=it.id==='sleep';
+    body=`<span class="ico">${ic('target')}</span><div class="bt"><b>${esc(it.n)}</b>${nowT}${sy?'<small class="sl">[SYSTEM LOCK]</small>':''}</div>${cdn}`;
+    tick=sy?`<button class="tick" data-toggle="${it.id}" aria-label="Mark complete">${ic('check')}${ic('lock')}</button>`:tickBtn(it.id);
+    attrs=`data-task="${it.id}"`;if(sy)cls+=' sysl';
+  }
+  const pen=((it.kind==='normal'||it.kind==='workout')&&Lock.penOk(it))?`<button class="pen" data-act="rtedit" data-id="${esc(it.id)}" aria-label="Edit or reschedule ${esc(it.n)}">${ic('pencil')}</button>`:'';
+  const swh=(attrs.indexOf('data-task')>=0||attrs.indexOf('data-wrow')>=0)?`<div class="swh r">${ic('check')}Complete</div><div class="swh l">Skip${ic('right')}</div>`:'';
+  return `<div class="${cls}" ${attrs} data-s="${sm}" data-e="${em}">${swh}<div class="when">${when}</div><div class="dot"></div><div class="rb">${body}${pen}</div>${tick}</div>`;
+}
+
+function vDay(){
+  const wd=vd.getDay(),k=iso(vd),ne=nextExam();
+  let h=dateNav();
+  h+=`<div class="stagger">`;
+  h+=`<section class="dh">${ringHtml(104,'dial')}<div class="dh-r"><div class="dh-pct"><b data-v28="pct">0</b><small>%</small></div><div class="dh-l" data-v28="cnt"></div><div class="dh-l" data-v28="st"></div>
+   <div class="dh-chips"><span class="chip streak">${ic('flame')}<span data-streak>0</span> day streak</span><span class="chip" style="color:var(--am)">${ic('bolt')}<span data-xp>0</span> XP</span></div></div></section>`;
+  h+=Sleep.banner();h+=sundayBanner();
+  if(ne){const c=countdown(ne.e);h+=`<section class="card banner" data-go="exams" style="cursor:pointer">${ic('exam')}<div class="grow"><b>${esc(ne.e.name)}</b><p class="mu sm">${esc(ne.e.subject||'')}${ne.e.subject?' · ':''}${esc(ne.e.date)} ${ne.e.time?fmtT(ne.e.time):''}</p></div><span class="cd ${c.c}">${c.t}</span></section>`}
+  h+=habitsToday();
+  if(wd!==0&&!S.routine.length)h+=addCard('Your schedule is empty','Add Task','rt');
+  if(wd===0){
+    h+=`<section class="card empty"><b>Sunday is free</b>No fixed schedule today. Add your own tasks below and tick them off.</section>`;
+  }else if(S.routine.length){
+    h+=`<div class="tlt"><span class="eyebrow">The map timeline</span>${Lock.mode()==='future'?'':editToggle()}</div><div class="tlx">${dayWM()}<section class="card tl${Edit.on?' ed':''}">${routineSorted().map(it=>rowHtml(it,wd)).join('')}</section></div>`;
+  }
+  const ex=S.extras[k]||[];
+  h+=`<section class="xt"><div class="eyebrow" style="margin-bottom:10px">${wd===0?'Your tasks / waypoints':'Extra tasks / waypoints'}</div>
+    ${ex.map(x=>`<div class="logrow" data-task="${x.id}">${tickBtn(x.id)}<div class="grow"><b>${esc(x.label)}</b></div><button class="icon-btn del" data-act="delx" data-id="${x.id}" aria-label="Delete task">${ic('trash')}</button></div>`).join('')}
+    <form class="row2" data-form="extra" style="margin-top:${ex.length?10:0}px"><div class="wpin">${ic('plus')}<input name="label" placeholder="Add waypoints to route…" maxlength="80" required aria-label="New task"></div><button class="btn" type="submit">${ic('plus')}Add</button></form></section>`;
+  h+=readyCard();
+  h+=`<section class="card"><div class="mrow"><span class="eyebrow">Level <b style="font-family:var(--serif);font-size:20px;color:var(--tx)" data-lv>1</b></span><span class="sm mu" data-xpin></span></div><div class="xpbar" data-xpbar><i></i></div></section>`;
+  h+=shieldCard();
+  if(!S.name)h+=`<section class="card banner"><div class="grow"><b>Make it yours</b><p class="mu sm">Add your name and photo.</p></div><button class="btn sm" data-go="profile">Set up</button></section>`;
+  h+=`</div>`;
+  return h;
+}
+
+const V28={
+  paint(){
+    const q=document.querySelector('[data-v28="pct"]');if(!q)return;
+    const s=stats(vd),pct=s.pct,m=Lock.mode();
+    q.textContent=pct===null?'—':pct;
+    const c=document.querySelector('[data-v28="cnt"]');
+    if(c)c.textContent=pct===null?'NO SCHEDULE':s.done+' OF '+s.total+' DONE · '+STREAK_PCT+'% TARGET';
+    const st=document.querySelector('[data-v28="st"]');
+    if(st){
+      let t;
+      if(pct===null)t='REST · FREE DAY';
+      else if(m==='future')t='QUEUED · STANDBY';
+      else if(m==='past')t=pct>=STREAK_PCT?'ARCHIVED · TARGET MET':'ARCHIVED · SEALED';
+      else{
+        const n=new Date(),nm=n.getHours()*60+n.getMinutes();
+        const late=$$('.tl .row[data-s]').filter(r=>+r.dataset.e>+r.dataset.s&&+r.dataset.e<=nm&&!r.classList.contains('done')&&!r.classList.contains('skipped')).length;
+        t=pct>=STREAK_PCT?'TARGET MET · NOMINAL':late>=2?'ACTIVE · BEHIND':'ACTIVE · NOMINAL';
+      }
+      st.textContent='STATUS: '+t;
+    }
+    const rg=document.querySelector('.ring.dial');
+    if(rg)rg.style.setProperty('--hr',(new Date().getMinutes()*6)+'deg');
+    this.cd();
+  },
+  cd(){
+    const r=document.querySelector('.tl .row.now');if(!r)return;
+    const el=r.querySelector('[data-cdn]');if(!el)return;
+    const s=+r.dataset.s;let e=+r.dataset.e;if(e<=s)e+=1440;
+    const n=new Date();let nm=n.getHours()*60+n.getMinutes()+n.getSeconds()/60;if(nm<s)nm+=1440;
+    const rem=Math.max(0,Math.round((e-nm)*60)),mm=Math.floor(rem/60),ss=rem%60;
+    el.innerHTML='-'+(mm>=100?Math.floor(mm/60)+'H '+pad(mm%60)+'M':pad(mm)+':'+pad(ss))+'<small>'+(mm>=100?'':'MIN')+'</small>';
+  }
+};
+setInterval(()=>{if(!document.hidden)V28.cd()},1000);
+setInterval(()=>{if(!document.hidden)V28.paint()},30000);
+
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
 const SHIELD_COST=500,SHIELD_MAX=2,PR_XP=50,RING_XP={p:40,w:30};
@@ -2881,7 +3078,7 @@ function habitsToday(){
   const today=sod(new Date()),k=iso(today),sc=S.habits.filter(x=>hSched(x,today));
   if(!sc.length)return'';
   const dn=sc.filter(x=>hDone(x,today)).length;
-  return `<section class="card qd"><div class="mrow"><span class="eyebrow">Today’s habits</span><button class="sm mu" data-go="habit">${dn}/${sc.length} · open ${ic('right')}</button></div>
+  return `<section class="card qd"><div class="mrow"><span class="eyebrow">Today’s habits</span><button class="sm mu" data-go="habit">${dn}/${sc.length} open ${ic('right')}</button></div>
    <div class="qd-row">${sc.map(x=>`<button class="qd-b ${hDone(x,today)?'on':''}" style="--hc:${x.col}" data-x="htog" data-id="${x.id}" data-k="${k}"><span>${hDone(x,today)?ic('check'):esc(x.ic||'🎯')}</span><i>${esc(x.n)}</i></button>`).join('')}</div></section>`;
 }
 let hForm=null;
@@ -4912,7 +5109,7 @@ document.addEventListener('focusout',()=>{if(Sync.needRender)setTimeout(()=>{con
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)&&!window.__STANDALONE__){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
-window.__dayforge={Lock,Edit,WB,Hold,Rcpt,receiptData,receiptCanvas,Tags,taskState,winFor,scoreFor,disciplineDelta,Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
+window.__dayforge={V28,Lock,Edit,WB,Hold,Rcpt,receiptData,receiptCanvas,Tags,taskState,winFor,scoreFor,disciplineDelta,Sleep,Viz,Sync,m3,heatCard,dayXp,get S(){return S},swipeDone,lockInfo,shieldCheck,weekData,energyLines,widgetState,toggle,go,Snd,AlertSnd,Viz,Pomo,Notif,Sync,DB,Blobs,Guard,Modal,tasksFor,streakInfo,persistable,sessionOnly,defaults,
   setDate(d){vd=sod(d);follow=false;render(true)}};
 })();
 </script>
