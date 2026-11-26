@@ -3186,7 +3186,7 @@ const VX_QUERY=`
 QUERY MODE: The user message also contains an OPERATOR QUERY. Answer it directly and accurately, whatever the topic, in VECTOR's voice: clinical, blunt, no praise, no greetings, no emojis, no exclamation marks. Use telemetry only when relevant. For this message ignore the 3-line structure and respond in exactly this format instead:
 [RESPONSE]: (direct answer, under 4 short declarative sentences)
 [DIRECTIVE]: (one clear action to execute next)`;
-const VX_MODELS={anthropic:['claude-haiku-5-5','claude-sonnet-5-5'],gemini:['gemini-2.5-flash']};
+const VX_MODELS={anthropic:['claude-haiku-5-5','claude-sonnet-5-5'],gemini:['gemini-3.5-flash-lite']};
 const VX_TTL=30*60000;
 const Vector={
   busy:false,err:'',ms:0,sig:null,faultAt:0,pending:'',
@@ -3268,7 +3268,7 @@ const Vector={
   async ask(tel,q){
     const c=this.cfg(),key=this.key(),user='TELEMETRY\n'+JSON.stringify(tel)+(q?'\nOPERATOR QUERY: '+q:''),sys=VX_PROMPT+(q?VX_QUERY:''),hist=q?this.chat():[];
     if(c.provider==='gemini'){
-      const apiKey=key,data=await this.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey.trim()}`,{method:'POST',headers:{'content-type':'application/json'},
+      const apiKey=key,data=await this.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey.trim()}`,{method:'POST',headers:{'content-type':'application/json'},
         body:JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents:[].concat(...hist.map(h=>[{role:'user',parts:[{text:'OPERATOR QUERY: '+h.q}]},{role:'model',parts:[{text:h.a}]}])).concat([{role:'user',parts:[{text:user}]}]),generationConfig:{maxOutputTokens:q?450:300,thinkingConfig:{thinkingBudget:0}}})});
       try{return String(data.candidates[0].content.parts[0].text||'').trim()}catch(_){const f=data&&data.promptFeedback&&data.promptFeedback.blockReason;throw new Error('ERR: 200 '+(f?'blocked: '+f:'no candidates in response'))}
     }
@@ -3317,7 +3317,7 @@ const Vector={
     return `<section class="vx vxs" id="vxCfg"><div class="vx-h"><span>API KEY // VECTOR</span><span>${hasKey?'KEY SET':'NO KEY'}</span></div>
     <label class="vx-l">PROVIDER</label><div class="vx-pv" role="radiogroup" aria-label="Provider">${opt('anthropic','ANTHROPIC')}${opt('gemini','GOOGLE GEMINI')}</div>
     <label class="vx-l" for="vxKey">${p==='gemini'?'GEMINI API KEY (FREE TIER)':'ANTHROPIC API KEY'}</label><input id="vxKey" class="vx-i" type="password" autocomplete="off" spellcheck="false" placeholder="${hasKey?'stored on this device. enter a new key to replace':p==='gemini'?'AIza...':'sk-ant-...'}" data-vx-in="key">
-    <label class="vx-l" for="vxModel">MODEL</label>${p==='anthropic'?`<select id="vxModel" class="vx-i" data-vx-in="model">${VX_MODELS.anthropic.map(m=>`<option ${m===c.model?'selected':''}>${m}</option>`).join('')}</select>`:`<div class="vx-i" id="vxModel" style="color:#8b909b">gemini-2.5-flash (fixed)</div>`}
+    <label class="vx-l" for="vxModel">MODEL</label>${p==='anthropic'?`<select id="vxModel" class="vx-i" data-vx-in="model">${VX_MODELS.anthropic.map(m=>`<option ${m===c.model?'selected':''}>${m}</option>`).join('')}</select>`:`<div class="vx-i" id="vxModel" style="color:#8b909b">gemini-3.5-flash-lite (fixed)</div>`}
     <label class="vx-chk"><input type="checkbox" id="vxAuto" data-vx-in="auto" ${c.auto?'checked':''}><span>AUTO-SYNC ON DAY OPEN AND ON BLOCK COMPLETE / MISS. READOUT CACHED 30 MIN.</span></label>
     <div class="vx-f" style="margin-top:12px"><span>KEYS STAY ON THIS DEVICE. NOT SYNCED, NOT BACKED UP. WITHOUT A KEY, VECTOR RUNS LOCAL RULES.</span></div>
     <div class="vx-f"><span></span><span class="vx-hr"><button class="vxb" data-vx-act="forget">[REMOVE KEY]</button><button class="vxb" data-vx-act="clear">[CLEAR READOUT]</button></span></div></section>`;
