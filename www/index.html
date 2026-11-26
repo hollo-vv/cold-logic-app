@@ -1291,7 +1291,7 @@ function defaults(){
     tt,wk,routine,exams:[],
     habits:[['Workout','💪',3,[1,2,3,5,6]],['Sandhya Vandhanam','🙏',0,[0,1,2,3,4,5,6]],['Reading','📖',2,[0,1,2,3,4,5,6]],['Hydration','💧',1,[0,1,2,3,4,5,6]],['Study Session','🎯',4,[1,2,3,4,5,6]]].map((h,i)=>({id:'h_seed'+i,n:h[0],ic:h[1],col:['#8b5cf6','#22d3ee','#fbbf24','#34d399','#fb7185'][h[2]],days:h[3],log:{},created:iso(new Date())})),
     todos:[],diary:{pin:'',salt:'',entries:[]},
-    skip:{},ready:{},shield:{n:0,used:[],chk:''},alerts:[],spend:[],xpOpen:{},xpDay:{},sleep:{cutoff:'22:20',on:true,log:{}},hold:{on:true,ids:['wake']},viz:{side:'aura',focus:'terrain'},heldAt:{},doneAt:{},commit:{},lifts:{},prs:{},prLog:[],focus:{log:[],broken:[]},rewards:{},
+    skip:{},ready:{},shield:{n:0,used:[],chk:''},alerts:[],spend:[],xpOpen:{},xpDay:{},sleep:{cutoff:'22:20',on:true,log:{}},hold:{on:true,ids:['wake']},viz:{side:'aura',focus:'terrain'},wviz:{progress:'ring',next:'terrain',actions:'orbital',focus:'orb',aura:'aura'},heldAt:{},doneAt:{},commit:{},lifts:{},prs:{},prLog:[],focus:{log:[],broken:[]},rewards:{},
     staples:[['Protein shake',150,25],['2 boiled eggs',155,13],['Greek yogurt',100,10],['Paneer 100g',265,18],['Peanut butter toast',260,10]].map((s,i)=>({id:'s_seed'+i,n:s[0],kcal:s[1],p:s[2]}))
   };
 }
@@ -1323,7 +1323,7 @@ function fixup(){
   if(!Array.isArray(S.diary.entries))S.diary.entries=[];
   if(typeof S.diary.pin!=='string')S.diary.pin='';if(typeof S.diary.salt!=='string')S.diary.salt='';
   const O=k=>{if(!S[k]||typeof S[k]!=='object'||Array.isArray(S[k]))S[k]={}},A=k=>{if(!Array.isArray(S[k]))S[k]=[]};
-  ['skip','ready','xpOpen','lifts','prs','rewards','xpDay'].forEach(O);S.sleep=Object.assign({cutoff:'22:20',on:true},S.sleep||{});if(!S.sleep.log||typeof S.sleep.log!=='object')S.sleep.log={};S.hold=Object.assign({on:true,ids:['wake']},S.hold||{});if(!Array.isArray(S.hold.ids))S.hold.ids=['wake'];S.viz=Object.assign({side:'aura',focus:'terrain'},S.viz||{});['heldAt','doneAt','commit'].forEach(O);['alerts','spend','prLog'].forEach(A);
+  ['skip','ready','xpOpen','lifts','prs','rewards','xpDay'].forEach(O);S.sleep=Object.assign({cutoff:'22:20',on:true},S.sleep||{});if(!S.sleep.log||typeof S.sleep.log!=='object')S.sleep.log={};S.hold=Object.assign({on:true,ids:['wake']},S.hold||{});if(!Array.isArray(S.hold.ids))S.hold.ids=['wake'];S.viz=Object.assign({side:'aura',focus:'terrain'},S.viz||{});S.wviz=Object.assign({progress:'ring',next:'terrain',actions:'orbital',focus:'orb',aura:'aura'},S.wviz||{});['heldAt','doneAt','commit'].forEach(O);['alerts','spend','prLog'].forEach(A);
   O('shield');if(typeof S.shield.n!=='number')S.shield.n=0;if(!Array.isArray(S.shield.used))S.shield.used=[];if(typeof S.shield.chk!=='string')S.shield.chk='';
   O('focus');if(!Array.isArray(S.focus.log))S.focus.log=[];if(!Array.isArray(S.focus.broken))S.focus.broken=[];
   if(!Array.isArray(S.staples))S.staples=d.staples;
@@ -1670,6 +1670,7 @@ function vEdit(){
     ${holdSettings()}
     ${statusSettings()}
     ${vizSettings()}
+    ${widgetVizSettings()}
     ${widgetSettings()}
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">App version</div><div class="setrow"><div><b>${APP_VER}</b><div class="sm mu" style="margin-top:4px">The app checks for updates by itself.</div></div><button class="btn sm" data-x="updchk">Check now</button></div></section>
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">Diary</div><div class="setrow"><div><b>Diary passcode</b><div class="sm mu" style="margin-top:4px">4-digit code asked every time the diary opens.</div></div><button class="btn sm" data-x="dpass">${ic('lock')}${S.diary.pin?'Change Diary Passcode':'Set Diary Passcode'}</button></div></section>
@@ -1867,7 +1868,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611260815',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611260912',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -2453,7 +2454,7 @@ const WB={
 function widgetSettings(){
   const nat=!!WB.plug();
   return `<section class="card"><div class="eyebrow" style="margin-bottom:10px">Home-screen widgets</div>
-  <p class="sm mu">Four Android widgets: Today progress, Now and next, Quick buttons (Day, Work-out, Fuel, +250 ml water) and Focus with a live sleep-cutoff countdown.</p>
+  <p class="sm mu">Five transparent Android widgets: Today progress, Now and next, Quick buttons (Day, Work-out, Fuel, +250 ml water), Focus with a live sleep-cutoff countdown, and Aura. Each has a visualizer behind it, chosen in Widget visualizers below.</p>
   <p class="sm mu" style="margin-top:8px">${nat?'To add one: press and hold an empty spot on your home screen, tap Widgets, then choose COLD LOGIC. They refresh whenever you leave the app.':'Widgets are only available in the installed Android app.'}</p></section>`;
 }
 
@@ -3104,6 +3105,29 @@ const FocusViz={
   stop(){this.on=false;cancelAnimationFrame(this.raf);this.raf=0;this.wf=null;Viz.cvx=null}
 };
 
+
+/* ---- v30: choose a visualizer for every home-screen widget ---- */
+const WV_DEF={progress:'ring',next:'terrain',actions:'orbital',focus:'orb',aura:'aura'};
+const WV_NAMES=[['progress','Today progress'],['next','Now / Next'],['actions','Quick buttons'],['focus','Focus hours'],['aura','Aura']];
+const WV_OPTS=[['off','Off'],['aura','Icy aura'],['orbital','Orbital aura'],['orb','Spike orb'],['terrain','Wave terrain'],['ring','2D ring']];
+function wvGet(k){const v=(S.wviz||{})[k];return WV_OPTS.some(o=>o[0]===v)?v:WV_DEF[k]}
+function widgetVizSettings(){
+  const all=WV_NAMES.map(n=>wvGet(n[0])),same=all.every(x=>x===all[0])?all[0]:null;
+  const row=(k,n,cur)=>`<div class="fld" style="margin-top:12px"><label>${n}</label><div class="vzopts" role="radiogroup" aria-label="${n}">${WV_OPTS.map(([v,t])=>`<button class="vzo ${cur===v?'on':''}" role="radio" aria-checked="${cur===v}" data-v30="${k}" data-val="${v}">${t}</button>`).join('')}</div></div>`;
+  return `<section class="card"><div class="eyebrow" style="margin-bottom:6px">Widget visualizers</div>
+  <p class="sm mu">Every home-screen widget has a transparent background with a visualizer behind it. Pick one per widget, or set them all at once.</p>
+  ${row('all','All widgets',same)}
+  ${WV_NAMES.map(([k,n])=>row(k,n,wvGet(k))).join('')}
+  <p class="sm mu" style="margin-top:12px">A widget is a still picture, not an animation. Rays grow and the terrain ridge moves as your day fills up, and it redraws whenever the app syncs. Widgets that are already on your home screen change after the next sync.</p></section>`;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('[data-v30]');if(!b)return;
+  S.wviz=Object.assign({},WV_DEF,S.wviz||{});
+  const k=b.dataset.v30,v=b.dataset.val;
+  if(k==='all')WV_NAMES.forEach(n=>{S.wviz[n[0]]=v});else S.wviz[k]=v;
+  save();render(true);try{pushWidget()}catch(_){}
+});
+
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
 const SHIELD_COST=500,SHIELD_MAX=2,PR_XP=50,RING_XP={p:40,w:30};
@@ -3449,7 +3473,7 @@ function widgetState(){
     });
   }
   const st=stats(today),si=streakInfo();
-  return {v:1,updated:new Date().toISOString(),date:iso(today),activeBlock:active,nextBlock:next,completionPct:st.pct===null?0:st.pct,tasksDone:st.done,tasksTotal:st.total,streak:si.cur,bestStreak:si.best,level:level(),xp:S.xp,xpInLevel:S.xp%LV,xpPerLevel:LV,shields:S.shield.n,readiness:S.ready[iso(today)]==null?null:S.ready[iso(today)]};
+  return {wviz:S.wviz,v:1,updated:new Date().toISOString(),date:iso(today),activeBlock:active,nextBlock:next,completionPct:st.pct===null?0:st.pct,tasksDone:st.done,tasksTotal:st.total,streak:si.cur,bestStreak:si.best,level:level(),xp:S.xp,xpInLevel:S.xp%LV,xpPerLevel:LV,shields:S.shield.n,readiness:S.ready[iso(today)]==null?null:S.ready[iso(today)]};
 }
 let _wj='';
 let _wto=0;
