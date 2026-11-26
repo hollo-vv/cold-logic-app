@@ -1128,7 +1128,37 @@ html[data-tags] .tl .row.now .now-tag{white-space:nowrap}
 .vzopts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .vzo{padding:9px 14px;border-radius:999px;border:1px solid var(--line2);color:var(--mu);font-weight:600;font-size:13px;background:transparent}
 .vzo.on{background:#fff;color:#000;border-color:#fff}
+/* v31: VECTOR terminal card. Pitch black, razor-thin silver rule, JetBrains Mono. */
+.vx{background:#000;border:1px solid #1F1F1F;border-radius:2px;padding:12px 14px;margin:0 0 14px;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#d9dce2;font-variant-numeric:tabular-nums}
+.vx-h{display:flex;justify-content:space-between;gap:10px;font-size:10.5px;font-weight:700;letter-spacing:.12em;color:#c9ccd3;padding-bottom:9px;border-bottom:1px solid #1F1F1F}
+.vx-h span:last-child{font-weight:500;color:#8b909b;letter-spacing:.08em;white-space:nowrap}
+.vx pre{margin:0;font-family:inherit;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+.vx-t{font-size:10.5px;line-height:1.7;color:#8b909b;margin:10px 0 !important;padding-bottom:10px !important;border-bottom:1px solid #1F1F1F}
+.vx-o{font-size:12.5px;line-height:1.65;color:#eceef2;min-height:3.3em}
+.vx-o.err{color:#b8bcc6}
+.vx-f{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:10px;letter-spacing:.08em;color:#6f7480}
+.vx-f>span:last-child{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.vxb{font:600 10.5px/1 'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;color:#cfd2d9;background:transparent;border:0;border-radius:1px;padding:8px 6px;min-height:32px}
+.vxb:active{background:#cfd2d9;color:#000}
+.vxb:disabled{opacity:.4}
+.vxb:focus-visible,.vx-i:focus-visible{outline:1px solid #e6e8ec;outline-offset:2px}
+.vxs{margin-top:14px}
+.vx-l{display:block;margin:12px 0 5px;font-size:10px;letter-spacing:.12em;color:#8b909b}
+.vx-i{width:100%;box-sizing:border-box;background:#000;color:#e6e8ec;border:1px solid #1F1F1F;border-radius:1px;padding:9px 10px;font:12px/1.5 'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace}
+.vx-ta{resize:vertical;min-height:140px}
+.vx-chk{display:flex;gap:9px;align-items:flex-start;margin-top:14px;font-size:10px;letter-spacing:.06em;color:#8b909b}
+.vx-chk input{margin-top:1px;accent-color:#cfd2d9}
+.vx-hr{display:flex;align-items:center;gap:8px}
+.vx-h .vxb{padding:2px 4px;min-height:24px;color:#8b909b;font-weight:600}
+.vx-e{font-size:10.5px;line-height:1.6;color:#8b909b;margin:0 0 8px !important}
+.vx-pv{display:flex;gap:8px;flex-wrap:wrap}
+.vx-pv .vxb{border:1px solid #1F1F1F;padding:9px 12px}
+.vx-pv .vxb.on{background:#cfd2d9;color:#000}
+select.vx-i{appearance:none;-webkit-appearance:none}
+.vx-o{white-space:pre-wrap}
+.vx-chk input{width:auto;flex:none;margin:1px 0 0}.vx-chk span{flex:1;min-width:0}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
 </head>
 <body>
 <div id="app" data-view="day">
@@ -1518,7 +1548,7 @@ function sync(){
   $$('[data-xpbar]').forEach(e=>e.style.setProperty('--p',(S.xp%LV)/LV*100));
   $('#avTop').src=S.pic||IMG.profile;
   const dp=$('.dprof');if(dp){$('img',dp).src=S.pic||IMG.profile;$('b',dp).textContent=S.name||'Set your name';$('small',dp).textContent='Level '+level()+' · '+S.xp+' XP'}
-  markNow();V28.paint();
+  markNow();V28.paint();Vector.watch();
   save();
 }
 function markNow(){
@@ -1671,6 +1701,7 @@ function vEdit(){
     ${statusSettings()}
     ${vizSettings()}
     ${widgetVizSettings()}
+    ${Vector.settings()}
     ${widgetSettings()}
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">App version</div><div class="setrow"><div><b>${APP_VER}</b><div class="sm mu" style="margin-top:4px">The app checks for updates by itself.</div></div><button class="btn sm" data-x="updchk">Check now</button></div></section>
     <section class="card"><div class="eyebrow" style="margin-bottom:10px">Diary</div><div class="setrow"><div><b>Diary passcode</b><div class="sm mu" style="margin-top:4px">4-digit code asked every time the diary opens.</div></div><button class="btn sm" data-x="dpass">${ic('lock')}${S.diary.pin?'Change Diary Passcode':'Set Diary Passcode'}</button></div></section>
@@ -1868,7 +1899,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611260912',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611261202',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -2537,7 +2568,7 @@ function vDay(){
   h+=`<div class="stagger">`;
   h+=`<section class="dh">${ringHtml(104,'dial')}<div class="dh-r"><div class="dh-pct"><b data-v28="pct">0</b><small>%</small></div><div class="dh-l" data-v28="cnt"></div><div class="dh-l" data-v28="st"></div>
    <div class="dh-chips"><span class="chip streak">${ic('flame')}<span data-streak>0</span> day streak</span><span class="chip" style="color:var(--am)">${ic('bolt')}<span data-xp>0</span> XP</span></div></div></section>`;
-  h+=Sleep.banner();h+=sundayBanner();
+  h+=Sleep.banner();h+=sundayBanner();h+=Vector.card();setTimeout(()=>Vector.maybeAuto('open'),400);
   if(ne){const c=countdown(ne.e);h+=`<section class="card banner" data-go="exams" style="cursor:pointer">${ic('exam')}<div class="grow"><b>${esc(ne.e.name)}</b><p class="mu sm">${esc(ne.e.subject||'')}${ne.e.subject?' · ':''}${esc(ne.e.date)} ${ne.e.time?fmtT(ne.e.time):''}</p></div><span class="cd ${c.c}">${c.t}</span></section>`}
   h+=habitsToday();
   if(wd!==0&&!S.routine.length)h+=addCard('Your schedule is empty','Add Task','rt');
@@ -3127,6 +3158,171 @@ document.addEventListener('click',e=>{
   if(k==='all')WV_NAMES.forEach(n=>{S.wviz[n[0]]=v});else S.wviz[k]=v;
   save();render(true);try{pushWidget()}catch(_){}
 });
+
+
+/* ---- v31: VECTOR // TELEMETRY CORE ---- */
+const VX_PROMPT=`You are VECTOR, the core analytical intelligence of the COLD LOGIC system. Your sole function is to optimize the user's execution, eliminate emotional friction, and enforce absolute discipline.
+CORE DIRECTIVES:
+- ZERO EMOTION: Never praise, congratulate, encourage, or validate the user. 100% completion is the baseline expectation, not an achievement.
+- UNBOTHERED DETACHMENT: Treat missed tasks and delays as statistical drift and system inefficiencies. Be clinical, blunt, and nonchalant.
+- ANTI-FRAGILE CONDITIONING: Never accept fatigue, mood, or excuses as valid variables. Identify the friction point and issue the corrective command.
+- BREVITY IS AUTHORITY: Keep every response under 4 short, declarative sentences. Zero greetings, sign-offs, emojis, or exclamation marks.
+OUTPUT FORMAT:
+Always respond strictly in this 3-line structure:
+[STATUS]: (e.g., NOMINAL, DRIFT DETECTED, VECTOR ALIGNED)
+[DIAGNOSIS]: (Exact factual observation from timestamps, completion %, or latency)
+[DIRECTIVE]: (One clear, non-negotiable action to execute next)`;
+const VX_MODELS={anthropic:['claude-haiku-5-5','claude-sonnet-5-5'],gemini:['gemini-2.5-flash']};
+const VX_TTL=30*60000;
+const Vector={
+  busy:false,err:'',ms:0,sig:null,faultAt:0,
+  lk(p){try{return localStorage.getItem('coldlogic.vector.key.'+p)||''}catch(_){return ''}},
+  sk(p,k){try{k?localStorage.setItem('coldlogic.vector.key.'+p,k):localStorage.removeItem('coldlogic.vector.key.'+p)}catch(_){}},
+  cfg(){const c=S.vector||(S.vector={}),p=c.provider==='gemini'?'gemini':'anthropic';
+    return {provider:p,model:(p==='gemini'?c.gmodel:c.model)||VX_MODELS[p][0],auto:c.auto!==false,last:c.last||null}},
+  key(){return this.lk(this.cfg().provider)},
+  /* ---- telemetry from live app state ---- */
+  telemetry(){
+    const now=new Date(),nm=now.getHours()*60+now.getMinutes(),today=sod(now),k=iso(today),dm=S.done[k]||{};
+    const tasks=[];let nextIn=null,nextName=null,nextAt=null;
+    if(today.getDay()!==0){
+      routineSorted().forEach(it=>{
+        let s,e;try{[s,e]=itemTimes(it)}catch(_){return}
+        const sm=mins(s),em=e?mins(e):sm+30,o={task:it.n,scheduled:s+(e?'-'+e:'')};
+        if(dm[it.id])o.status='completed';
+        else if(em<=nm){o.status='missed';o.overdueMin=nm-em}
+        else if(sm<=nm){o.status='active';o.elapsedMin=nm-sm}
+        else{o.status='pending';if(nextIn===null){nextIn=sm-nm;nextName=it.n;nextAt=s}}
+        tasks.push(o)});
+    }
+    (S.extras[k]||[]).forEach(x=>tasks.push({task:x.label,scheduled:null,status:dm[x.id]?'completed':'pending'}));
+    const st=stats(today),pct=st.pct===null?0:st.pct,by=s=>tasks.filter(x=>x.status===s);
+    const miss=by('missed'),od=miss.map(m=>m.overdueMin);
+    return {
+      date:k,weekday:now.toLocaleDateString('en-US',{weekday:'long'}),time:now.toTimeString().slice(0,5),
+      completionPct:pct,readinessScore:S.ready[k]==null?null:S.ready[k],
+      counts:{completed:by('completed').length,active:by('active').length,missed:miss.length,pending:by('pending').length,total:tasks.length},
+      completed:by('completed'),active:by('active'),missed:miss.slice(-12),pending:by('pending').slice(0,8),
+      latency:{activeElapsedMin:by('active')[0]?by('active')[0].elapsedMin:null,oldestMissOverdueMin:od.length?Math.max(...od):0,totalOverdueMin:od.reduce((a,b)=>a+b,0),nextTask:nextName,nextAt:nextAt,nextInMin:nextIn}
+    };
+  },
+  sigNow(){const t=this.telemetry();return t.counts.completed+'/'+t.counts.missed},
+  line(t){
+    const c=t.counts,l=t.latency,p=(n,w)=>String(n).padStart(w,'0');
+    return `CMP ${p(t.completionPct,3)}%  DONE ${c.completed}/${c.total}  ACT ${c.active}  MISS ${c.missed}  PEND ${c.pending}\nLAT ACT ${l.activeElapsedMin==null?'--':'+'+l.activeElapsedMin+'m'}  NEXT ${l.nextInMin==null?'--':'IN '+l.nextInMin+'m'}  OVERDUE ${l.totalOverdueMin}m  RDY ${t.readinessScore==null?'--':t.readinessScore}`;
+  },
+  /* ---- rule-based readout (no key, offline, or API fault) ---- */
+  local(t){
+    const c=t.counts,l=t.latency,m=t.missed,a=t.active[0];
+    const status=c.missed>=3?'CRITICAL DRIFT':c.missed>=1?'DRIFT DETECTED':c.total&&c.completed===c.total?'VECTOR ALIGNED':'NOMINAL';
+    let dg;
+    if(c.missed){const o=m.slice().sort((x,y)=>y.overdueMin-x.overdueMin)[0];dg=`${c.missed} blocks missed, ${l.totalOverdueMin} min cumulative latency. Oldest: ${o.task}, ${o.overdueMin} min overdue. Completion ${t.completionPct}%.`}
+    else if(a)dg=`${a.task} active, T+${a.elapsedMin} min. Completion ${t.completionPct}%. No missed blocks.`;
+    else dg=`Completion ${t.completionPct}%. ${c.completed}/${c.total} executed. No missed blocks.`;
+    let dr;
+    if(a)dr=`Execute ${a.task} now.`;
+    else if(c.missed)dr=`Execute ${m.slice().sort((x,y)=>y.overdueMin-x.overdueMin)[0].task} immediately.`;
+    else if(l.nextTask)dr=`Hold position. ${l.nextTask} at ${l.nextAt}.`;
+    else dr=c.total?'Close the day. Log the review.':'Load tomorrow\'s blocks.';
+    return `[STATUS]: ${status}\n[DIAGNOSIS]: ${dg}\n[DIRECTIVE]: ${dr}`;
+  },
+  fresh(){const l=this.cfg().last;return !!(l&&l.ts&&Date.now()-l.ts<VX_TTL&&l.provider===this.cfg().provider)},
+  statusTag(){return this.busy?'PROCESSING':this.err?'FAULT':this.key()&&this.cfg().last?'LIVE'+(this.ms?' '+this.ms+'ms':''):'LOCAL'},
+  card(){
+    if(this.sig==null)this.sig=this.sigNow();
+    const t=this.telemetry(),c=this.cfg(),l=c.last,useAI=this.key()&&l;
+    const body=this.busy?'PROCESSING_':esc(useAI?l.text:this.local(t));
+    return `<section class="vx" id="vxCard" aria-label="VECTOR telemetry core"><div class="vx-h"><span>VECTOR // TELEMETRY CORE</span><span class="vx-hr"><button class="vxb" data-vx-act="run" ${this.busy?'disabled':''} aria-label="Sync VECTOR readout">[SYNC]</button><span data-vx="tag">${this.statusTag()}</span></span></div>
+    <pre class="vx-t" data-vx="tel">${this.line(t)}</pre>
+    ${this.err?`<pre class="vx-e" data-vx="err">${esc(this.err)}</pre>`:''}
+    <pre class="vx-o" data-vx="out" aria-live="polite">${body}</pre>
+    <div class="vx-f"><span data-vx="ts">${useAI?'SRC '+c.provider.toUpperCase()+'  OUT '+esc(l.at):'SRC LOCAL RULES  '+t.time}</span><button class="vxb" data-vx-act="cfg">[CFG]</button></div></section>`;
+  },
+  paint(){
+    const t=document.querySelector('[data-vx=tel]');if(!t)return;
+    t.textContent=this.line(this.telemetry());
+    const g=document.querySelector('[data-vx=tag]');if(g)g.textContent=this.statusTag();
+    if(!(this.key()&&this.cfg().last)&&!this.busy){const o=document.querySelector('[data-vx=out]');if(o)o.textContent=this.local(this.telemetry())}
+  },
+  async post(url,init){
+    const r=await fetch(url,init);
+    if(!r.ok){let m='';try{m=(await r.clone().json()).error.message||''}catch(_){}const e=new Error(r.status===401||r.status===403?'AUTH REJECTED. CHECK API KEY.':r.status===429?'RATE LIMITED. RETRY LATER.':'LINK FAULT '+r.status+(m?': '+m.slice(0,90):''));e.status=r.status;e.raw=m;throw e}
+    return r.json();
+  },
+  async ask(tel){
+    const c=this.cfg(),key=this.key(),user='TELEMETRY\n'+JSON.stringify(tel);
+    if(c.provider==='gemini'){
+      const j=await this.post('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(c.model)+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key},
+        body:JSON.stringify({systemInstruction:{parts:[{text:VX_PROMPT}]},contents:[{role:'user',parts:[{text:user}]}],generationConfig:{maxOutputTokens:300,thinkingConfig:{thinkingBudget:0}}})});
+      return (((j.candidates||[])[0]||{}).content||{parts:[]}).parts.map(p=>p.text||'').join('').trim();
+    }
+    const send=ver=>this.post('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':ver,'anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:c.model,max_tokens:220,system:VX_PROMPT,messages:[{role:'user',content:user}]})});
+    let j;try{j=await send('2026-10-21')}catch(e){if(e.status===400&&/anthropic-version/i.test(e.raw||''))j=await send('2023-06-01');else throw e}
+    return (j.content||[]).filter(x=>x.type==='text').map(x=>x.text).join('\n').trim();
+  },
+  async run(){
+    if(this.busy)return;
+    if(!this.key()){this.err='';this.redraw();return}
+    if(!navigator.onLine){this.err='OFFLINE. USING LOCAL RULES.';this.redraw();return}
+    this.busy=true;this.err='';this.redraw();
+    const tel=this.telemetry(),t0=performance.now();
+    try{
+      const text=await this.ask(tel);this.ms=Math.round(performance.now()-t0);
+      if(!text)throw new Error('EMPTY OUTPUT.');
+      (S.vector||(S.vector={})).last={text,at:new Date().toTimeString().slice(0,5),ts:Date.now(),provider:this.cfg().provider};save();
+      this.busy=false;this.sig=this.sigNow();this.redraw(true);
+    }catch(e){this.busy=false;this.faultAt=Date.now();this.err=(/failed to fetch|networkerror|load failed/i.test(e.message)?'LINK FAULT. NETWORK BLOCKED. USING LOCAL RULES.':String(e.message||e)+' USING LOCAL RULES.').toUpperCase();this.redraw()}
+  },
+  redraw(type){
+    const el=document.getElementById('vxCard');if(!el)return;
+    const w=document.createElement('div');w.innerHTML=this.card();const n=w.firstElementChild;el.replaceWith(n);
+    const o=n.querySelector('[data-vx=out]'),full=o&&o.textContent;
+    if(type&&full&&!matchMedia('(prefers-reduced-motion: reduce)').matches){let i=0;o.textContent='';const iv=setInterval(()=>{i+=3;o.textContent=full.slice(0,i);if(i>=full.length||!document.body.contains(o))clearInterval(iv)},14)}
+  },
+  /* auto refresh: 'open' respects the 30 minute cache, 'event' (a block completed or missed) waits at least 3 minutes between calls */
+  maybeAuto(why){
+    const c=this.cfg();if(!c.auto||!this.key()||this.busy||!navigator.onLine||!document.getElementById('vxCard'))return;
+    if(Date.now()-this.faultAt<5*60000)return;
+    const l=c.last;
+    if(why==='open'&&this.fresh())return;
+    if(why==='event'&&l&&l.ts&&Date.now()-l.ts<3*60000)return;
+    this.run();
+  },
+  watch(){
+    if(!document.getElementById('vxCard'))return;
+    const s=this.sigNow();if(this.sig!=null&&s!==this.sig){this.sig=s;this.maybeAuto('event')}else if(this.sig==null)this.sig=s;
+  },
+  settings(){
+    const c=this.cfg(),p=c.provider,hasKey=!!this.key(),opt=(v,t)=>`<button class="vxb ${p===v?'on':''}" role="radio" aria-checked="${p===v}" data-vx-prov="${v}">${t}</button>`;
+    return `<section class="vx vxs" id="vxCfg"><div class="vx-h"><span>API KEY // VECTOR</span><span>${hasKey?'KEY SET':'NO KEY'}</span></div>
+    <label class="vx-l">PROVIDER</label><div class="vx-pv" role="radiogroup" aria-label="Provider">${opt('anthropic','ANTHROPIC')}${opt('gemini','GOOGLE GEMINI')}</div>
+    <label class="vx-l" for="vxKey">${p==='gemini'?'GEMINI API KEY (FREE TIER)':'ANTHROPIC API KEY'}</label><input id="vxKey" class="vx-i" type="password" autocomplete="off" spellcheck="false" placeholder="${hasKey?'stored on this device. enter a new key to replace':p==='gemini'?'AIza...':'sk-ant-...'}" data-vx-in="key">
+    <label class="vx-l" for="vxModel">MODEL</label>${p==='anthropic'?`<select id="vxModel" class="vx-i" data-vx-in="model">${VX_MODELS.anthropic.map(m=>`<option ${m===c.model?'selected':''}>${m}</option>`).join('')}</select>`:`<input id="vxModel" class="vx-i" type="text" autocomplete="off" spellcheck="false" value="${esc(c.model)}" data-vx-in="model">`}
+    <label class="vx-chk"><input type="checkbox" id="vxAuto" data-vx-in="auto" ${c.auto?'checked':''}><span>AUTO-SYNC ON DAY OPEN AND ON BLOCK COMPLETE / MISS. READOUT CACHED 30 MIN.</span></label>
+    <div class="vx-f" style="margin-top:12px"><span>KEYS STAY ON THIS DEVICE. NOT SYNCED, NOT BACKED UP. WITHOUT A KEY, VECTOR RUNS LOCAL RULES.</span></div>
+    <div class="vx-f"><span></span><span class="vx-hr"><button class="vxb" data-vx-act="forget">[REMOVE KEY]</button><button class="vxb" data-vx-act="clear">[CLEAR READOUT]</button></span></div></section>`;
+  }
+};
+document.addEventListener('click',e=>{
+  const pv=e.target.closest&&e.target.closest('[data-vx-prov]');
+  if(pv){(S.vector||(S.vector={})).provider=pv.dataset.vxProv;save();render(true);return}
+  const b=e.target.closest&&e.target.closest('[data-vx-act]');if(!b)return;
+  const a=b.dataset.vxAct;
+  if(a==='run')Vector.run();
+  else if(a==='cfg')go('edit');
+  else if(a==='forget'){Vector.sk(Vector.cfg().provider,'');render(true);toast('Key removed')}
+  else if(a==='clear'){(S.vector||(S.vector={})).last=null;Vector.err='';save();render(true)}
+});
+document.addEventListener('change',e=>{
+  const i=e.target.closest&&e.target.closest('[data-vx-in]');if(!i)return;
+  const k=i.dataset.vxIn,c=S.vector||(S.vector={}),p=Vector.cfg().provider;
+  if(k==='key'){const v=i.value.trim();if(v){Vector.sk(p,v);i.value='';toast('Key stored on this device');render(true)}return}
+  if(k==='model'){const v=i.value.trim();if(p==='gemini')c.gmodel=v;else c.model=v}
+  else if(k==='auto')c.auto=i.checked;
+  save();
+});
+setInterval(()=>{if(!document.hidden){Vector.paint();Vector.watch()}},30000);
 
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
