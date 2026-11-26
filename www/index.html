@@ -1157,6 +1157,16 @@ html[data-tags] .tl .row.now .now-tag{white-space:nowrap}
 select.vx-i{appearance:none;-webkit-appearance:none}
 .vx-o{white-space:pre-wrap}
 .vx-chk input{width:auto;flex:none;margin:1px 0 0}.vx-chk span{flex:1;min-width:0}
+.vx-f .vx-err{color:#d9dce2;white-space:pre-wrap;overflow-wrap:anywhere;letter-spacing:.02em;text-transform:none}
+.vx-q{display:flex;align-items:center;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid #1F1F1F}
+.vx-qp{color:#8b909b;font-size:13px;font-weight:700}
+.vx-qi{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#eceef2;caret-color:#eceef2;font:12.5px/1.5 'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;padding:8px 2px;-webkit-appearance:none}
+.vx-qi::placeholder{color:#555a64}
+.vx-q .vxb{color:#cfd2d9}
+.vx-h{font-size:10px;letter-spacing:.07em;flex-wrap:nowrap}
+.vx-h>span:first-child{white-space:nowrap}
+.vx-h .vx-hr{gap:5px;min-width:0}
+.vx-h [data-vx=tag]{font-size:9px;letter-spacing:.04em;white-space:nowrap}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
 </head>
@@ -1899,7 +1909,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611261202',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611261417',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -3172,10 +3182,16 @@ Always respond strictly in this 3-line structure:
 [STATUS]: (e.g., NOMINAL, DRIFT DETECTED, VECTOR ALIGNED)
 [DIAGNOSIS]: (Exact factual observation from timestamps, completion %, or latency)
 [DIRECTIVE]: (One clear, non-negotiable action to execute next)`;
+const VX_QUERY=`
+QUERY MODE: The user message also contains an OPERATOR QUERY. Answer it directly and accurately, whatever the topic, in VECTOR's voice: clinical, blunt, no praise, no greetings, no emojis, no exclamation marks. Use telemetry only when relevant. For this message ignore the 3-line structure and respond in exactly this format instead:
+[RESPONSE]: (direct answer, under 4 short declarative sentences)
+[DIRECTIVE]: (one clear action to execute next)`;
 const VX_MODELS={anthropic:['claude-haiku-5-5','claude-sonnet-5-5'],gemini:['gemini-2.5-flash']};
 const VX_TTL=30*60000;
 const Vector={
-  busy:false,err:'',ms:0,sig:null,faultAt:0,
+  busy:false,err:'',ms:0,sig:null,faultAt:0,pending:'',
+  chat(){try{return JSON.parse(localStorage.getItem('coldlogic.vector.chat')||'[]')}catch(_){return []}},
+  addChat(q,a){try{const l=this.chat();l.push({q,a});localStorage.setItem('coldlogic.vector.chat',JSON.stringify(l.slice(-4)))}catch(_){}},
   lk(p){try{return localStorage.getItem('coldlogic.vector.key.'+p)||''}catch(_){return ''}},
   sk(p,k){try{k?localStorage.setItem('coldlogic.vector.key.'+p,k):localStorage.removeItem('coldlogic.vector.key.'+p)}catch(_){}},
   cfg(){const c=S.vector||(S.vector={}),p=c.provider==='gemini'?'gemini':'anthropic';
@@ -3227,56 +3243,59 @@ const Vector={
     return `[STATUS]: ${status}\n[DIAGNOSIS]: ${dg}\n[DIRECTIVE]: ${dr}`;
   },
   fresh(){const l=this.cfg().last;return !!(l&&l.ts&&Date.now()-l.ts<VX_TTL&&l.provider===this.cfg().provider)},
-  statusTag(){return this.busy?'PROCESSING':this.err?'FAULT':this.key()&&this.cfg().last?'LIVE'+(this.ms?' '+this.ms+'ms':''):'LOCAL'},
+  statusTag(){const c=this.cfg(),l=c.last;return this.busy?'PROCESSING':this.err?'FAULT':this.key()&&l&&l.provider===c.provider?c.provider.toUpperCase()+' // LIVE':'LOCAL'},
   card(){
     if(this.sig==null)this.sig=this.sigNow();
-    const t=this.telemetry(),c=this.cfg(),l=c.last,useAI=this.key()&&l;
-    const body=this.busy?'PROCESSING_':esc(useAI?l.text:this.local(t));
+    const t=this.telemetry(),c=this.cfg(),l=c.last,useAI=this.key()&&l&&l.provider===c.provider;
+    const body=this.busy?(this.pending?'> '+esc(this.pending)+'\n':'')+'PROCESSING_':(useAI&&l.q?'> '+esc(l.q)+'\n':'')+esc(useAI?l.text:this.local(t));
     return `<section class="vx" id="vxCard" aria-label="VECTOR telemetry core"><div class="vx-h"><span>VECTOR // TELEMETRY CORE</span><span class="vx-hr"><button class="vxb" data-vx-act="run" ${this.busy?'disabled':''} aria-label="Sync VECTOR readout">[SYNC]</button><span data-vx="tag">${this.statusTag()}</span></span></div>
     <pre class="vx-t" data-vx="tel">${this.line(t)}</pre>
-    ${this.err?`<pre class="vx-e" data-vx="err">${esc(this.err)}</pre>`:''}
     <pre class="vx-o" data-vx="out" aria-live="polite">${body}</pre>
-    <div class="vx-f"><span data-vx="ts">${useAI?'SRC '+c.provider.toUpperCase()+'  OUT '+esc(l.at):'SRC LOCAL RULES  '+t.time}</span><button class="vxb" data-vx-act="cfg">[CFG]</button></div></section>`;
+    <form class="vx-q" data-vx-form autocomplete="off"><label for="vxQ" class="vx-qp">&gt;</label><input id="vxQ" class="vx-qi" name="q" maxlength="400" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="${this.key()?'ask VECTOR':'no api key. queries need a link'}" ${this.busy?'disabled':''}><button class="vxb" type="submit" ${this.busy?'disabled':''}>[SEND]</button></form>
+    <div class="vx-f"><span data-vx="ts" class="${this.err?'vx-err':''}">${this.err?esc(this.err):useAI?'SRC '+c.provider.toUpperCase()+'  OUT '+esc(l.at):'SRC LOCAL RULES  '+t.time}</span><button class="vxb" data-vx-act="cfg">[CFG]</button></div></section>`;
   },
   paint(){
     const t=document.querySelector('[data-vx=tel]');if(!t)return;
     t.textContent=this.line(this.telemetry());
     const g=document.querySelector('[data-vx=tag]');if(g)g.textContent=this.statusTag();
-    if(!(this.key()&&this.cfg().last)&&!this.busy){const o=document.querySelector('[data-vx=out]');if(o)o.textContent=this.local(this.telemetry())}
+    if(!(this.key()&&this.cfg().last&&this.cfg().last.provider===this.cfg().provider)&&!this.busy){const o=document.querySelector('[data-vx=out]');if(o)o.textContent=this.local(this.telemetry())}
   },
   async post(url,init){
     const r=await fetch(url,init);
-    if(!r.ok){let m='';try{m=(await r.clone().json()).error.message||''}catch(_){}const e=new Error(r.status===401||r.status===403?'AUTH REJECTED. CHECK API KEY.':r.status===429?'RATE LIMITED. RETRY LATER.':'LINK FAULT '+r.status+(m?': '+m.slice(0,90):''));e.status=r.status;e.raw=m;throw e}
+    if(r.status!==200){let m='';try{const j=await r.clone().json();m=(j.error&&(j.error.message||j.error.status))||j.message||''}catch(_){}const e=new Error('ERR: '+r.status+' '+(m||r.statusText||'request failed'));e.status=r.status;e.raw=m;throw e}
     return r.json();
   },
-  async ask(tel){
-    const c=this.cfg(),key=this.key(),user='TELEMETRY\n'+JSON.stringify(tel);
+  async ask(tel,q){
+    const c=this.cfg(),key=this.key(),user='TELEMETRY\n'+JSON.stringify(tel)+(q?'\nOPERATOR QUERY: '+q:''),sys=VX_PROMPT+(q?VX_QUERY:''),hist=q?this.chat():[];
     if(c.provider==='gemini'){
-      const j=await this.post('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(c.model)+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key},
-        body:JSON.stringify({systemInstruction:{parts:[{text:VX_PROMPT}]},contents:[{role:'user',parts:[{text:user}]}],generationConfig:{maxOutputTokens:300,thinkingConfig:{thinkingBudget:0}}})});
-      return (((j.candidates||[])[0]||{}).content||{parts:[]}).parts.map(p=>p.text||'').join('').trim();
+      const apiKey=key,data=await this.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey.trim()}`,{method:'POST',headers:{'content-type':'application/json'},
+        body:JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents:[].concat(...hist.map(h=>[{role:'user',parts:[{text:'OPERATOR QUERY: '+h.q}]},{role:'model',parts:[{text:h.a}]}])).concat([{role:'user',parts:[{text:user}]}]),generationConfig:{maxOutputTokens:q?450:300,thinkingConfig:{thinkingBudget:0}}})});
+      try{return String(data.candidates[0].content.parts[0].text||'').trim()}catch(_){const f=data&&data.promptFeedback&&data.promptFeedback.blockReason;throw new Error('ERR: 200 '+(f?'blocked: '+f:'no candidates in response'))}
     }
     const send=ver=>this.post('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':ver,'anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:c.model,max_tokens:220,system:VX_PROMPT,messages:[{role:'user',content:user}]})});
+      body:JSON.stringify({model:c.model,max_tokens:q?400:220,system:sys,messages:[].concat(...hist.map(h=>[{role:'user',content:'OPERATOR QUERY: '+h.q},{role:'assistant',content:h.a}])).concat([{role:'user',content:user}])})});
     let j;try{j=await send('2026-10-21')}catch(e){if(e.status===400&&/anthropic-version/i.test(e.raw||''))j=await send('2023-06-01');else throw e}
     return (j.content||[]).filter(x=>x.type==='text').map(x=>x.text).join('\n').trim();
   },
-  async run(){
+  async run(q){
     if(this.busy)return;
-    if(!this.key()){this.err='';this.redraw();return}
-    if(!navigator.onLine){this.err='OFFLINE. USING LOCAL RULES.';this.redraw();return}
-    this.busy=true;this.err='';this.redraw();
+    q=(q||'').trim();
+    if(!this.key()){this.err=q?'ERR: no API key. Add one under Settings > API KEY // VECTOR':'';this.redraw();return}
+    if(!navigator.onLine){this.err='ERR: offline';this.redraw();return}
+    this.busy=true;this.err='';this.pending=q;this.redraw();
     const tel=this.telemetry(),t0=performance.now();
     try{
-      const text=await this.ask(tel);this.ms=Math.round(performance.now()-t0);
-      if(!text)throw new Error('EMPTY OUTPUT.');
-      (S.vector||(S.vector={})).last={text,at:new Date().toTimeString().slice(0,5),ts:Date.now(),provider:this.cfg().provider};save();
-      this.busy=false;this.sig=this.sigNow();this.redraw(true);
-    }catch(e){this.busy=false;this.faultAt=Date.now();this.err=(/failed to fetch|networkerror|load failed/i.test(e.message)?'LINK FAULT. NETWORK BLOCKED. USING LOCAL RULES.':String(e.message||e)+' USING LOCAL RULES.').toUpperCase();this.redraw()}
+      const text=await this.ask(tel,q);this.ms=Math.round(performance.now()-t0);
+      if(!text)throw new Error('ERR: 200 empty output');
+      (S.vector||(S.vector={})).last={text,q,at:new Date().toTimeString().slice(0,5),ts:Date.now(),provider:this.cfg().provider};if(q)this.addChat(q,text);save();
+      this.busy=false;this.pending='';this.sig=this.sigNow();this.redraw(true);
+    }catch(e){this.busy=false;this.pending='';this.faultAt=Date.now();this.err=/failed to fetch|networkerror|load failed/i.test(e.message)?'ERR: network blocked or offline':String(e.message||e);this.redraw()}
   },
   redraw(type){
     const el=document.getElementById('vxCard');if(!el)return;
+    const keep=(el.querySelector('#vxQ')||{}).value||'',had=document.activeElement&&document.activeElement.id==='vxQ';
     const w=document.createElement('div');w.innerHTML=this.card();const n=w.firstElementChild;el.replaceWith(n);
+    {const qi=n.querySelector('#vxQ');if(qi&&keep&&!type){qi.value=keep}}
     const o=n.querySelector('[data-vx=out]'),full=o&&o.textContent;
     if(type&&full&&!matchMedia('(prefers-reduced-motion: reduce)').matches){let i=0;o.textContent='';const iv=setInterval(()=>{i+=3;o.textContent=full.slice(0,i);if(i>=full.length||!document.body.contains(o))clearInterval(iv)},14)}
   },
@@ -3298,7 +3317,7 @@ const Vector={
     return `<section class="vx vxs" id="vxCfg"><div class="vx-h"><span>API KEY // VECTOR</span><span>${hasKey?'KEY SET':'NO KEY'}</span></div>
     <label class="vx-l">PROVIDER</label><div class="vx-pv" role="radiogroup" aria-label="Provider">${opt('anthropic','ANTHROPIC')}${opt('gemini','GOOGLE GEMINI')}</div>
     <label class="vx-l" for="vxKey">${p==='gemini'?'GEMINI API KEY (FREE TIER)':'ANTHROPIC API KEY'}</label><input id="vxKey" class="vx-i" type="password" autocomplete="off" spellcheck="false" placeholder="${hasKey?'stored on this device. enter a new key to replace':p==='gemini'?'AIza...':'sk-ant-...'}" data-vx-in="key">
-    <label class="vx-l" for="vxModel">MODEL</label>${p==='anthropic'?`<select id="vxModel" class="vx-i" data-vx-in="model">${VX_MODELS.anthropic.map(m=>`<option ${m===c.model?'selected':''}>${m}</option>`).join('')}</select>`:`<input id="vxModel" class="vx-i" type="text" autocomplete="off" spellcheck="false" value="${esc(c.model)}" data-vx-in="model">`}
+    <label class="vx-l" for="vxModel">MODEL</label>${p==='anthropic'?`<select id="vxModel" class="vx-i" data-vx-in="model">${VX_MODELS.anthropic.map(m=>`<option ${m===c.model?'selected':''}>${m}</option>`).join('')}</select>`:`<div class="vx-i" id="vxModel" style="color:#8b909b">gemini-2.5-flash (fixed)</div>`}
     <label class="vx-chk"><input type="checkbox" id="vxAuto" data-vx-in="auto" ${c.auto?'checked':''}><span>AUTO-SYNC ON DAY OPEN AND ON BLOCK COMPLETE / MISS. READOUT CACHED 30 MIN.</span></label>
     <div class="vx-f" style="margin-top:12px"><span>KEYS STAY ON THIS DEVICE. NOT SYNCED, NOT BACKED UP. WITHOUT A KEY, VECTOR RUNS LOCAL RULES.</span></div>
     <div class="vx-f"><span></span><span class="vx-hr"><button class="vxb" data-vx-act="forget">[REMOVE KEY]</button><button class="vxb" data-vx-act="clear">[CLEAR READOUT]</button></span></div></section>`;
@@ -3323,6 +3342,10 @@ document.addEventListener('change',e=>{
   save();
 });
 setInterval(()=>{if(!document.hidden){Vector.paint();Vector.watch()}},30000);
+document.addEventListener('submit',e=>{
+  const f=e.target.closest&&e.target.closest('[data-vx-form]');if(!f)return;
+  e.preventDefault();const i=f.querySelector('#vxQ'),q=i.value.trim();if(!q)return;i.value='';Vector.run(q);
+});
 
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
