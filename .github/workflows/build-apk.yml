@@ -385,6 +385,25 @@ jobs:
             cp -r /tmp/android-clean android
             rm -f /tmp/widgets_on
           fi
+      - name: Cache Gradle downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('package.json') }}
+          restore-keys: gradle-${{ runner.os }}-
+      - name: Use a Maven mirror first (avoids rate limit errors)
+        run: |
+          mkdir -p ~/.gradle/init.d
+          cat > ~/.gradle/init.d/mirror.gradle <<'GRADLE'
+          def mirror = 'https://maven-central.storage-download.googleapis.com/maven2/'
+          allprojects {
+            buildscript { repositories { maven { url mirror } } }
+            repositories { maven { url mirror } }
+          }
+          GRADLE
+          sed -i 's/^          //' ~/.gradle/init.d/mirror.gradle
       - name: Sync web files
         run: npx cap sync android
       - name: Build APK
@@ -393,14 +412,14 @@ jobs:
           cd android
           chmod +x gradlew
           ok=0
-          for i in 1 2 3; do
-            if ./gradlew assembleDebug --refresh-dependencies 2>&1 | tee /tmp/gradle.log; then ok=1; break; fi
+          for i in 1 2 3 4; do
+            if ./gradlew assembleDebug 2>&1 | tee /tmp/gradle.log; then ok=1; break; fi
             if [ -f /tmp/widgets_on ] && grep -qE "error:|Execution failed for task ':app:(compile|process|merge|verify|package)" /tmp/gradle.log; then
               echo "::warning::The widget code did not build. Building the app without widgets."
               break
             fi
-            echo "Attempt $i failed, retrying in 30s"
-            sleep 30
+            echo "Attempt $i failed, retrying in 90s"
+            sleep 90
           done
           if [ $ok -ne 1 ]; then
             if [ -f /tmp/widgets_on ]; then
@@ -411,7 +430,7 @@ jobs:
               npx cap sync android
               cd android
               chmod +x gradlew
-              ./gradlew assembleDebug --refresh-dependencies || exit 1
+              ./gradlew assembleDebug || exit 1
             else
               exit 1
             fi
