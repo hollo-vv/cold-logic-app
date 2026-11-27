@@ -2010,7 +2010,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611270443',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611271554',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -3358,7 +3358,7 @@ function vxTune(provider,model){
   else if(/qwen3/i.test(model))p.reasoning_effort='none';
   return p;
 }
-const vxClean=t=>String(t||'').replace(/<think>[\s\S]*?(<\/think>|$)/g,'').trim();
+const vxClean=t=>{t=String(t||'').replace(/<think>[\s\S]*?(<\/think>|$)/g,'');if(t.indexOf('</think>')>=0)t=t.slice(t.lastIndexOf('</think>')+8);return t.replace(/<\/?think>/g,'').trim()};
 async function vxCall(provider,model,messages,{signal,onDelta}){
   const local=provider==='local',headers={'Content-Type':'application/json'};
   if(local){
@@ -3369,7 +3369,7 @@ async function vxCall(provider,model,messages,{signal,onDelta}){
   }else headers.Authorization='Bearer '+Vector.key();
   const stream=!!(local&&onDelta);
   const data=await vxFetch(local?VX_LOCAL+'/chat/completions':VX_GROQ,{method:'POST',headers,signal,
-    body:JSON.stringify(Object.assign({model,messages,stream},vxTune(provider,model))),onDelta:stream?t=>onDelta(vxClean(t)):undefined});
+    body:JSON.stringify(Object.assign({model,messages,stream},vxTune(provider,model))),onDelta:stream?t=>onDelta(/<\/think>/.test(t)||!/^\s*(okay|hmm|alright|let me|let's|first,|so,? the user|the user|looking at)/i.test(t)?vxClean(t):''):undefined});
   const ch=data&&data.choices&&data.choices[0],text=vxClean(ch&&ch.message&&ch.message.content);
   if(!text)throw new VxError('empty','empty completion');
   return {text,provider,model,cut:ch.finish_reason==='length'};
