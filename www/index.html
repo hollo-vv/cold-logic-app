@@ -1909,7 +1909,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611261417',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611270309',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -2414,7 +2414,7 @@ function taskState(k,id,win){
   if(m[id]){
     if(!at)return {s:'DONE'};
     const w=win&&win[id];if(!w)return {s:'EXEC'};
-    let t=mins(at),a=w[0],b=w[1];if(b<a)b+=1440;if(t<a&&b>1440)t+=1440;
+    let t=mins(at),a=w[0],b=w[1];if(b<a)b+=1440;if(t<a&&b>1440&&(t<=b-1440||t-(b-1440)<=a-t))t+=1440;
     return t>b?{s:'LATE',n:t-b}:{s:'EXEC'};
   }
   if(sk[id])return {s:'VOID'};
@@ -3186,16 +3186,16 @@ const VX_QUERY=`
 QUERY MODE: The user message also contains an OPERATOR QUERY. Answer it directly and accurately, whatever the topic, in VECTOR's voice: clinical, blunt, no praise, no greetings, no emojis, no exclamation marks. Use telemetry only when relevant. For this message ignore the 3-line structure and respond in exactly this format instead:
 [RESPONSE]: (direct answer, under 4 short declarative sentences)
 [DIRECTIVE]: (one clear action to execute next)`;
-const VX_MODELS={anthropic:['claude-haiku-5-5','claude-sonnet-5-5'],gemini:['gemini-3.5-flash-lite']};
+const VX_MODELS={anthropic:['claude-haiku-5-5','claude-sonnet-5-5'],gemini:[]};
 const VX_TTL=30*60000;
 const Vector={
-  busy:false,err:'',ms:0,sig:null,faultAt:0,pending:'',
+  busy:false,err:'',ms:0,sig:null,faultAt:0,pending:'',model:'',
   chat(){try{return JSON.parse(localStorage.getItem('coldlogic.vector.chat')||'[]')}catch(_){return []}},
   addChat(q,a){try{const l=this.chat();l.push({q,a});localStorage.setItem('coldlogic.vector.chat',JSON.stringify(l.slice(-4)))}catch(_){}},
   lk(p){try{return localStorage.getItem('coldlogic.vector.key.'+p)||''}catch(_){return ''}},
   sk(p,k){try{k?localStorage.setItem('coldlogic.vector.key.'+p,k):localStorage.removeItem('coldlogic.vector.key.'+p)}catch(_){}},
   cfg(){const c=S.vector||(S.vector={}),p=c.provider==='gemini'?'gemini':'anthropic';
-    return {provider:p,model:(p==='gemini'?c.gmodel:c.model)||VX_MODELS[p][0],auto:c.auto!==false,last:c.last||null}},
+    return {provider:p,model:(p==='gemini'?c.gmodel:c.model)||(VX_MODELS[p][0]||''),auto:c.auto!==false,last:c.last||null}},
   key(){return this.lk(this.cfg().provider)},
   /* ---- telemetry from live app state ---- */
   telemetry(){
@@ -3252,7 +3252,7 @@ const Vector={
     <pre class="vx-t" data-vx="tel">${this.line(t)}</pre>
     <pre class="vx-o" data-vx="out" aria-live="polite">${body}</pre>
     <form class="vx-q" data-vx-form autocomplete="off"><label for="vxQ" class="vx-qp">&gt;</label><input id="vxQ" class="vx-qi" name="q" maxlength="400" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="${this.key()?'ask VECTOR':'no api key. queries need a link'}" ${this.busy?'disabled':''}><button class="vxb" type="submit" ${this.busy?'disabled':''}>[SEND]</button></form>
-    <div class="vx-f"><span data-vx="ts" class="${this.err?'vx-err':''}">${this.err?esc(this.err):useAI?'SRC '+c.provider.toUpperCase()+'  OUT '+esc(l.at):'SRC LOCAL RULES  '+t.time}</span><button class="vxb" data-vx-act="cfg">[CFG]</button></div></section>`;
+    <div class="vx-f"><span data-vx="ts" class="${this.err?'vx-err':''}">${this.err?esc(this.err):useAI?'SRC '+(c.provider==='gemini'&&l.model?esc(l.model):c.provider.toUpperCase())+'  OUT '+esc(l.at):'SRC LOCAL RULES  '+t.time}</span><button class="vxb" data-vx-act="cfg">[CFG]</button></div></section>`;
   },
   paint(){
     const t=document.querySelector('[data-vx=tel]');if(!t)return;
@@ -3260,17 +3260,59 @@ const Vector={
     const g=document.querySelector('[data-vx=tag]');if(g)g.textContent=this.statusTag();
     if(!(this.key()&&this.cfg().last&&this.cfg().last.provider===this.cfg().provider)&&!this.busy){const o=document.querySelector('[data-vx=out]');if(o)o.textContent=this.local(this.telemetry())}
   },
+  /* Gemini keys (including the newer AQ. keys) go in the x-goog-api-key header; if Google rejects that, retry once with ?key= */
+  tf(url,init){const c=new AbortController(),t=setTimeout(()=>c.abort(),25000);return fetch(url,Object.assign({},init,{signal:c.signal})).finally(()=>clearTimeout(t))},
+  async gf(url,init){
+    const key=this.key().trim(),h=Object.assign({},init.headers||{},{'x-goog-api-key':key});
+    let r;
+    try{r=await this.tf(url,Object.assign({},init,{headers:h}))}catch(err){return await this.tf(url+(url.includes('?')?'&':'?')+'key='+encodeURIComponent(key),init)}
+    if(r.status===400||r.status===401||r.status===403){
+      try{const q=await this.tf(url+(url.includes('?')?'&':'?')+'key='+encodeURIComponent(key),init);if(q.status===200||q.status===r.status)return q}catch(_){}
+    }
+    return r;
+  },
   async post(url,init){
-    const r=await fetch(url,init);
+    const r=/generativelanguage\.googleapis\.com/.test(url)?await this.gf(url,init):await this.tf(url,init);
     if(r.status!==200){let m='';try{const j=await r.clone().json();m=(j.error&&(j.error.message||j.error.status))||j.message||''}catch(_){}const e=new Error('ERR: '+r.status+' '+(m||r.statusText||'request failed'));e.status=r.status;e.raw=m;throw e}
     return r.json();
   },
+  /* Ask Google which models this key can use, newest Flash first, so a retired or renamed model never breaks VECTOR */
+  async geminiModels(key){
+    const c=S.vector||{},pin=(c.gmodel||'').trim(),out=[];if(pin)out.push(pin);
+    let ids=null;
+    try{const cache=JSON.parse(localStorage.getItem('coldlogic.vector.gml')||'null');if(cache&&cache.k===key.slice(-6)&&Date.now()-cache.t<12*3600000)ids=cache.ids}catch(_){}
+    if(!ids){
+      try{
+        const r=await this.gf('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{});
+        if(r.status===200){const j=await r.json();ids=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>String(m.name).replace(/^models\//,''));
+          try{localStorage.setItem('coldlogic.vector.gml',JSON.stringify({k:key.slice(-6),t:Date.now(),ids}))}catch(_){}}
+        else{let m='';try{const e=await r.json();m=(e.error&&e.error.message)||''}catch(_){}throw Object.assign(new Error('ERR: '+r.status+' '+(m||r.statusText||'model list failed')),{status:r.status})}
+      }catch(e){if(e.status===400||e.status===401||e.status===403)throw e;ids=[]}
+    }
+    const bad=/image|tts|live|audio|embed|thinking|exp|robotics|computer|native|dictation|vision|learnlm|gemma/i;
+    const rank=id=>{const m=/^gemini-(\d+(?:\.\d+)?)-flash(-lite)?(.*)$/.exec(id);if(!m||bad.test(id))return -1;return parseFloat(m[1])*10-(m[2]?3:0)-(/preview/.test(m[3])?4:0)};
+    if(ids.includes('gemini-flash-latest'))out.push('gemini-flash-latest');
+    ids.filter(id=>rank(id)>0).sort((a,b)=>rank(b)-rank(a)).forEach(id=>out.push(id));
+    ['gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash'].forEach(id=>out.push(id));
+    return [...new Set(out)];
+  },
   async ask(tel,q){
     const c=this.cfg(),key=this.key(),user='TELEMETRY\n'+JSON.stringify(tel)+(q?'\nOPERATOR QUERY: '+q:''),sys=VX_PROMPT+(q?VX_QUERY:''),hist=q?this.chat():[];
+    if(c.provider!=='gemini'&&!/^sk-ant-/.test(key.trim()))throw new Error('ERR: Anthropic keys start with sk-ant-. check the key in CFG');
     if(c.provider==='gemini'){
-      const apiKey=key,data=await this.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey.trim()}`,{method:'POST',headers:{'content-type':'application/json'},
-        body:JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents:[].concat(...hist.map(h=>[{role:'user',parts:[{text:'OPERATOR QUERY: '+h.q}]},{role:'model',parts:[{text:h.a}]}])).concat([{role:'user',parts:[{text:user}]}]),generationConfig:{maxOutputTokens:q?450:300,thinkingConfig:{thinkingBudget:0}}})});
-      try{return String(data.candidates[0].content.parts[0].text||'').trim()}catch(_){const f=data&&data.promptFeedback&&data.promptFeedback.blockReason;throw new Error('ERR: 200 '+(f?'blocked: '+f:'no candidates in response'))}
+      const body=JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents:[].concat(...hist.map(h=>[{role:'user',parts:[{text:'OPERATOR QUERY: '+h.q}]},{role:'model',parts:[{text:h.a}]}])).concat([{role:'user',parts:[{text:user}]}]),generationConfig:{maxOutputTokens:1024}});
+      const cands=await this.geminiModels(key.trim());let lastErr=null;
+      for(const m of cands.slice(0,4)){
+        try{
+          const data=await this.post(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:'POST',headers:{'content-type':'application/json'},body});
+          const cand=(data.candidates||[])[0],parts=(cand&&cand.content&&cand.content.parts)||[];
+          const text=parts.filter(p=>!p.thought).map(p=>p.text||'').join('').trim();
+          if(!text){const f=(data.promptFeedback&&data.promptFeedback.blockReason)||(cand&&cand.finishReason)||'no candidates';throw Object.assign(new Error('ERR: 200 '+m+' returned no text ('+f+')'),{status:200,final:true})}
+          this.model=m;try{localStorage.setItem('coldlogic.vector.gmodel',m)}catch(_){}
+          return text;
+        }catch(e){lastErr=e;if(e.status===400||e.status===404||e.status===200){if(e.status!==200)e.message=e.message+' ['+m+']';continue}throw e}
+      }
+      throw lastErr||new Error('ERR: no Gemini model available for this key');
     }
     const send=ver=>this.post('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':ver,'anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:c.model,max_tokens:q?400:220,system:sys,messages:[].concat(...hist.map(h=>[{role:'user',content:'OPERATOR QUERY: '+h.q},{role:'assistant',content:h.a}])).concat([{role:'user',content:user}])})});
@@ -3287,9 +3329,9 @@ const Vector={
     try{
       const text=await this.ask(tel,q);this.ms=Math.round(performance.now()-t0);
       if(!text)throw new Error('ERR: 200 empty output');
-      (S.vector||(S.vector={})).last={text,q,at:new Date().toTimeString().slice(0,5),ts:Date.now(),provider:this.cfg().provider};if(q)this.addChat(q,text);save();
+      (S.vector||(S.vector={})).last={text,q,model:this.model||'',at:new Date().toTimeString().slice(0,5),ts:Date.now(),provider:this.cfg().provider};if(q)this.addChat(q,text);save();
       this.busy=false;this.pending='';this.sig=this.sigNow();this.redraw(true);
-    }catch(e){this.busy=false;this.pending='';this.faultAt=Date.now();this.err=/failed to fetch|networkerror|load failed/i.test(e.message)?'ERR: network blocked or offline':String(e.message||e);this.redraw()}
+    }catch(e){this.busy=false;this.pending='';this.faultAt=Date.now();this.err=e.name==='AbortError'?'ERR: timeout after 25s. press SEND to retry':/failed to fetch|networkerror|load failed/i.test(e.message)?'ERR: network failed ['+(location.protocol==='file:'?'file':location.host||'?')+'] '+(navigator.onLine?'online':'offline')+' / '+String(e.message).slice(0,60):String(e.message||e);this.redraw()}
   },
   redraw(type){
     const el=document.getElementById('vxCard');if(!el)return;
@@ -3316,8 +3358,8 @@ const Vector={
     const c=this.cfg(),p=c.provider,hasKey=!!this.key(),opt=(v,t)=>`<button class="vxb ${p===v?'on':''}" role="radio" aria-checked="${p===v}" data-vx-prov="${v}">${t}</button>`;
     return `<section class="vx vxs" id="vxCfg"><div class="vx-h"><span>API KEY // VECTOR</span><span>${hasKey?'KEY SET':'NO KEY'}</span></div>
     <label class="vx-l">PROVIDER</label><div class="vx-pv" role="radiogroup" aria-label="Provider">${opt('anthropic','ANTHROPIC')}${opt('gemini','GOOGLE GEMINI')}</div>
-    <label class="vx-l" for="vxKey">${p==='gemini'?'GEMINI API KEY (FREE TIER)':'ANTHROPIC API KEY'}</label><input id="vxKey" class="vx-i" type="password" autocomplete="off" spellcheck="false" placeholder="${hasKey?'stored on this device. enter a new key to replace':p==='gemini'?'AIza...':'sk-ant-...'}" data-vx-in="key">
-    <label class="vx-l" for="vxModel">MODEL</label>${p==='anthropic'?`<select id="vxModel" class="vx-i" data-vx-in="model">${VX_MODELS.anthropic.map(m=>`<option ${m===c.model?'selected':''}>${m}</option>`).join('')}</select>`:`<div class="vx-i" id="vxModel" style="color:#8b909b">gemini-3.5-flash-lite (fixed)</div>`}
+    <label class="vx-l" for="vxKey">${p==='gemini'?'GEMINI API KEY (FREE TIER)':'ANTHROPIC API KEY'}</label><input id="vxKey" class="vx-i" type="password" autocomplete="off" spellcheck="false" placeholder="${hasKey?'stored on this device. enter a new key to replace':p==='gemini'?'AIza... or AQ...':'sk-ant-...'}" data-vx-in="key">
+    <label class="vx-l" for="vxModel">MODEL</label>${p==='anthropic'?`<select id="vxModel" class="vx-i" data-vx-in="model">${VX_MODELS.anthropic.map(m=>`<option ${m===c.model?'selected':''}>${m}</option>`).join('')}</select>`:`<input id="vxModel" class="vx-i" type="text" autocomplete="off" spellcheck="false" placeholder="auto: newest Flash your key can use" value="${esc((S.vector&&S.vector.gmodel)||'')}" data-vx-in="model">${this.model?`<div class="vx-f" style="justify-content:flex-start"><span>LAST USED ${esc(this.model)}</span></div>`:''}`}
     <label class="vx-chk"><input type="checkbox" id="vxAuto" data-vx-in="auto" ${c.auto?'checked':''}><span>AUTO-SYNC ON DAY OPEN AND ON BLOCK COMPLETE / MISS. READOUT CACHED 30 MIN.</span></label>
     <div class="vx-f" style="margin-top:12px"><span>KEYS STAY ON THIS DEVICE. NOT SYNCED, NOT BACKED UP. WITHOUT A KEY, VECTOR RUNS LOCAL RULES.</span></div>
     <div class="vx-f"><span></span><span class="vx-hr"><button class="vxb" data-vx-act="forget">[REMOVE KEY]</button><button class="vxb" data-vx-act="clear">[CLEAR READOUT]</button></span></div></section>`;
@@ -3337,7 +3379,7 @@ document.addEventListener('change',e=>{
   const i=e.target.closest&&e.target.closest('[data-vx-in]');if(!i)return;
   const k=i.dataset.vxIn,c=S.vector||(S.vector={}),p=Vector.cfg().provider;
   if(k==='key'){const v=i.value.trim();if(v){Vector.sk(p,v);i.value='';toast('Key stored on this device');render(true)}return}
-  if(k==='model'){const v=i.value.trim();if(p==='gemini')c.gmodel=v;else c.model=v}
+  if(k==='model'){const v=i.value.trim();if(p==='gemini'){c.gmodel=v;try{localStorage.removeItem('coldlogic.vector.gml')}catch(_){}}else c.model=v}
   else if(k==='auto')c.auto=i.checked;
   save();
 });
