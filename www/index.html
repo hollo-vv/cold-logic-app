@@ -1909,7 +1909,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611270309',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611270443',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -3302,7 +3302,7 @@ const Vector={
     if(c.provider==='gemini'){
       const body=JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents:[].concat(...hist.map(h=>[{role:'user',parts:[{text:'OPERATOR QUERY: '+h.q}]},{role:'model',parts:[{text:h.a}]}])).concat([{role:'user',parts:[{text:user}]}]),generationConfig:{maxOutputTokens:1024}});
       const cands=await this.geminiModels(key.trim());let lastErr=null;
-      for(const m of cands.slice(0,4)){
+      for(const m of cands.slice(0,4).concat(cands.slice(0,2))){
         try{
           const data=await this.post(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:'POST',headers:{'content-type':'application/json'},body});
           const cand=(data.candidates||[])[0],parts=(cand&&cand.content&&cand.content.parts)||[];
@@ -3310,7 +3310,7 @@ const Vector={
           if(!text){const f=(data.promptFeedback&&data.promptFeedback.blockReason)||(cand&&cand.finishReason)||'no candidates';throw Object.assign(new Error('ERR: 200 '+m+' returned no text ('+f+')'),{status:200,final:true})}
           this.model=m;try{localStorage.setItem('coldlogic.vector.gmodel',m)}catch(_){}
           return text;
-        }catch(e){lastErr=e;if(e.status===400||e.status===404||e.status===200){if(e.status!==200)e.message=e.message+' ['+m+']';continue}throw e}
+        }catch(e){lastErr=e;if([429,500,502,503,504].includes(e.status)){await new Promise(r=>setTimeout(r,1500));continue}if(e.status===400||e.status===404||e.status===200){if(e.status!==200)e.message=e.message+' ['+m+']';continue}throw e}
       }
       throw lastErr||new Error('ERR: no Gemini model available for this key');
     }
