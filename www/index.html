@@ -1224,7 +1224,7 @@ select.vx-i{appearance:none;-webkit-appearance:none}
 
 .vx-page{position:relative;padding:16px 12px 22px;margin:0 -2px;border-radius:22px;background:radial-gradient(120% 60% at 50% 0%,rgba(110,80,230,.28),transparent 62%),radial-gradient(90% 60% at 100% 100%,rgba(70,60,170,.26),transparent 66%),linear-gradient(180deg,#10121d,#0b0c15 55%,#0f0b17)}
 .vx-hero{display:flex;flex-direction:column;align-items:center;gap:6px;padding:2px 0 14px;text-align:center;font-family:'JetBrains Mono',ui-monospace,monospace}
-.vx-hero canvas{width:88px;height:88px}
+.vx-hero canvas{width:132px;height:132px;margin-bottom:-14px}
 .vx-hero b{letter-spacing:.38em;font-size:13px;color:#eceef2;padding-left:.38em}
 .vx-hero small{font-size:9.5px;letter-spacing:.2em;color:#8b909b}
 .vx{background:linear-gradient(165deg,rgba(26,30,48,.92),rgba(13,13,22,.95) 55%,rgba(28,15,32,.92));border-color:rgba(255,255,255,.09);border-radius:14px}
@@ -2041,7 +2041,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611281314',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611281320',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -3763,7 +3763,30 @@ const _vxRedraw=Vector.redraw.bind(Vector);Vector.redraw=function(){_vxRedraw();
 /* VECTOR symbol: crimson ray burst; when thinking the rays pull in and morph into a rotating ring and triangle */
 (function(){let ph=0,last=0,mv=0,sp=.5,rot=0;
 let warm=false;
-function draw(cv,m,ph){const g=cv.getContext('2d'),W=cv.width,s=W/40,c=W/2;g.clearRect(0,0,W,W);g.lineCap='round';g.lineJoin='round';
+const CV=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]],CE=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]],CF=[[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[0,3,7,4],[1,2,6,5]];
+function crystal(cv,m,ph){const g=cv.getContext('2d'),W=cv.width,u=W/132,cx=W/2,cy=W*.44,S=34*u;g.clearRect(0,0,W,W);
+  const yaw=rot*.55+.6,pit=.62+.12*Math.sin(ph*.7),cy_=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pit),sp_=Math.sin(pit);
+  const P=CV.map(v=>{let x=v[0]*cy_+v[2]*sy,z=-v[0]*sy+v[2]*cy_,y=v[1]*cp-z*sp_;z=v[1]*sp_+z*cp;const k=1/(1+z*.18);return[x*k,y*k,z]});
+  const hA=warm?18:195,hB=warm?4:262,fl=m>.05&&Math.random()<m*.18;
+  function pass(ox,oy,col,w,al,flip){g.save();if(flip){g.translate(0,cy*2+S*.98);g.scale(1,-1);g.globalAlpha=.22}
+    g.strokeStyle=col;g.lineWidth=w*u;g.lineCap='round';g.globalAlpha*=al;
+    CE.forEach(e=>{const a=P[e[0]],b=P[e[1]];g.beginPath();g.moveTo(cx+a[0]*S+ox,cy+a[1]*S+oy);g.lineTo(cx+b[0]*S+ox,cy+b[1]*S+oy);g.stroke()});g.restore()}
+  /* faint faces */
+  CF.forEach((f,i)=>{let zz=0;f.forEach(k=>zz+=P[k][2]);const front=zz/4<0.0;g.beginPath();f.forEach((k,j)=>{const x=cx+P[k][0]*S,y=cy+P[k][1]*S;j?g.lineTo(x,y):g.moveTo(x,y)});g.closePath();g.fillStyle='hsla('+(i%2?hB:hA)+',90%,60%,'+(front?.1:.04)+')';g.fill()});
+  const sp=(1.6+m*5)*u*(fl?2:1);
+  g.save();g.globalCompositeOperation='lighter';
+  pass(-sp,0,'hsla(0,100%,62%,1)',1.2,.45);pass(sp,0,'hsla('+(warm?50:200)+',100%,62%,1)',1.2,.5);
+  g.shadowColor='hsla('+hA+',100%,60%,.95)';g.shadowBlur=10*u;pass(0,0,'hsla('+hA+',100%,65%,1)',2.4,.9);g.shadowBlur=0;
+  pass(0,0,'rgba(235,250,255,1)',.9,.95);
+  /* ghost copy drifting off axis */
+  const gx=(3.5+m*9)*u*Math.sin(ph*1.3);g.translate(-5*u-gx,3*u);g.globalAlpha=.3+m*.25;pass(0,0,'hsla('+hB+',100%,62%,1)',1,1);g.restore();
+  /* reflection */
+  g.save();g.globalCompositeOperation='lighter';pass(0,0,'hsla('+hA+',100%,65%,1)',1.6,.8,true);g.restore();
+  /* data specks along the edges */
+  g.fillStyle='rgba(220,245,255,.8)';CE.forEach((e,i)=>{const a=P[e[0]],b=P[e[1]],t=(ph*.35+i*.37)%1;g.fillRect(cx+(a[0]+(b[0]-a[0])*t)*S-.6*u,cy+(a[1]+(b[1]-a[1])*t)*S-.6*u,1.4*u,1.4*u)});
+  /* centre V */
+  g.strokeStyle='#fff';g.lineWidth=2*u;g.lineJoin='miter';g.shadowColor=warm?'rgba(255,120,80,.9)':'rgba(120,200,255,.95)';g.shadowBlur=7*u;g.beginPath();g.moveTo(cx-6*u,cy-7*u);g.lineTo(cx,cy+7.5*u);g.lineTo(cx+6*u,cy-7*u);g.stroke();g.shadowBlur=0}
+function draw(cv,m,ph){if(cv.width>100)return crystal(cv,m,ph);const g=cv.getContext('2d'),W=cv.width,s=W/40,c=W/2;g.clearRect(0,0,W,W);g.lineCap='round';g.lineJoin='round';
   const R=[[17,3,.6,1],[12.8,4,.5,-1.5],[9,3,.72,2]];
   R.forEach((q,k)=>{const rr=q[0]*(1-m*.05*k),n=q[1],span=6.2832/n*(q[2]+m*(1-q[2])*.5);
     for(let i=0;i<n;i++){const a0=rot*q[3]*(1+m*1.3)+i*6.2832/n+k*.9,hue=warm?(8+k*16+i*11)%360:190+k*26+i*14,al=.6+.35*Math.sin(ph*2+i*1.9+k);
@@ -3851,7 +3874,7 @@ requestAnimationFrame(f)})();
 setInterval(()=>{const q=document.getElementById('vxQ');if(!q||q.value||document.hidden)return;if(hold>0){hold--;return}
   const w=L[i];j+=d;q.placeholder=w.slice(0,j)+'_';if(j>=w.length){d=-1;hold=16}else if(j<=0){d=1;i=(i+1)%L.length;hold=4}},75)})();
 Vector.page=function(){if(!this._gt||Date.now()-this._gt>10*60000){this._gt=Date.now();this.greetE={t:'a',text:this.greetText(),tw:true}}this.pills=!this.log.length&&!this.last();setTimeout(()=>Vector.fmt(),0);setTimeout(()=>Vector.maybeAuto('open'),400);
-  return '<div class="vx-page"'+(this.warm()?' data-warm':'')+'><div class="vx-hero"><canvas class="vx-core" width="168" height="168" aria-hidden="true"></canvas><div class="vx-gw" aria-label="VECTOR" role="img"><span class="vx-gl"><span class="vx-gm"></span><i class="vx-gc"></i><i class="vx-gv"></i></span></div><small class="vx-hs">ASK. BREAK IT DOWN. EXECUTE.</small></div>'+this.card()+'</div>'};
+  return '<div class="vx-page"'+(this.warm()?' data-warm':'')+'><div class="vx-hero"><canvas class="vx-core" width="264" height="264" aria-hidden="true"></canvas><div class="vx-gw" aria-label="VECTOR" role="img"><span class="vx-gl"><span class="vx-gm"></span><i class="vx-gc"></i><i class="vx-gv"></i></span></div><small class="vx-hs">ASK. BREAK IT DOWN. EXECUTE.</small></div>'+this.card()+'</div>'};
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
 const SHIELD_COST=500,SHIELD_MAX=2,PR_XP=50,RING_XP={p:40,w:30};
