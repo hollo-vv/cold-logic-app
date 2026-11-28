@@ -1268,6 +1268,26 @@ select.vx-i{appearance:none;-webkit-appearance:none}
 @keyframes vxnm{0%,55%,100%{color:#eceef2;text-shadow:none;transform:translateY(0)}28%{color:var(--nmc);text-shadow:0 0 12px var(--nms);transform:translateY(-1.5px)}}
 @media(prefers-reduced-motion:reduce){.vx-nm i{animation:none}}
 form[data-form=extra] .wptime{flex:none;width:112px}
+.vx-hero{--g1:#9fdcff;--g2:#b08cff}
+.vx-page[data-warm] .vx-hero{--g1:#ffc39a;--g2:#ff5a45}
+.vx-sig{width:116px;height:46px;overflow:visible;margin:-4px 0 0;filter:drop-shadow(0 0 5px rgba(130,150,255,.45))}
+.vx-page[data-warm] .vx-sig{filter:drop-shadow(0 0 5px rgba(255,110,80,.5))}
+.vx-sp{stroke-dasharray:1;stroke-dashoffset:1;animation:vxdraw 5.2s cubic-bezier(.45,.05,.3,1) infinite}
+.vx-sd{transform-box:fill-box;transform-origin:center;animation:vxdot 5.2s ease-out infinite}
+.vx-hero.busy .vx-sp{animation-duration:1.7s}.vx-hero.busy .vx-sd{animation-duration:1.7s}
+@keyframes vxdraw{0%,6%{stroke-dashoffset:1;opacity:1}52%{stroke-dashoffset:0;opacity:1}84%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes vxdot{0%{transform:scale(0);opacity:1}8%{transform:scale(1.25)}14%,84%{transform:scale(1);opacity:1}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.vx-sp{animation:none;stroke-dashoffset:0}.vx-sd{animation:none}}
+.vx-hero{--gc:#4fd8ff;--gv:#a974ff}
+.vx-page[data-warm] .vx-hero{--gc:#ffb347;--gv:#ff4d3d}
+.vx-gw{height:54px;display:grid;place-items:center;overflow:visible;margin:2px 0 0}
+.vx-gl{position:relative;display:inline-block;white-space:pre}
+.vx-page .vx-gl,.vx-page .vx-gl *{font-family:'JetBrains Mono',ui-monospace,Consolas,monospace !important;font-weight:700;font-size:38px;letter-spacing:.2em;font-style:normal;line-height:54px}
+.vx-gm{display:block;background:linear-gradient(90deg,var(--g1),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent;padding-left:.2em}
+.vx-gc,.vx-gv{position:absolute;left:0;top:0;padding-left:.2em;pointer-events:none;mix-blend-mode:screen;opacity:0}
+.vx-gc{color:var(--gc)}.vx-gv{color:var(--gv)}
+.vx-page .vx-gw{filter:drop-shadow(0 0 7px rgba(130,150,255,.4))}
+.vx-page[data-warm] .vx-gw{filter:drop-shadow(0 0 7px rgba(255,110,80,.45))}
 /* font and send button */
 .vx-page,.vx-page *:not(.vx-t):not(pre):not(code):not(.vx-code *){font-family:'Space Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif}
 .vx-page .vx-qi{font-size:15px;letter-spacing:0}
@@ -1279,7 +1299,7 @@ form[data-form=extra] .wptime{flex:none;width:112px}
 .vx-go.stop svg{fill:currentColor;stroke:none;width:14px;height:14px}
 @media(prefers-reduced-motion:reduce){.vx.vx-busy:after,.vx-strip s.a,.vx-sys:after{animation:none}}
 </style>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@700&display=swap">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
 </head>
 <body>
@@ -2021,7 +2041,7 @@ function vProfile(){
 }
 
 /* ================= v22: automatic update detection ================= */
-const APP_VER='202611280309',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
+const APP_VER='202611281314',WEB_URL='https://hollo-vv.github.io/cold-logic/',APK_URL='https://github.com/hollo-vv/cold-logic-app/releases/latest/download/ColdLogic.apk';
 const Updater={native:false,latest:null,shown:false,timer:0,busy:false,
   isNative(){try{const C=window.Capacitor;return !!(C&&(!C.isNativePlatform||C.isNativePlatform()))}catch(e){return false}},
   async check(manual){
@@ -3373,7 +3393,7 @@ function vxTune(provider,model){
   else if(/qwen3/i.test(model))p.reasoning_effort='none';
   return p;
 }
-const vxClean=t=>{t=String(t||'').replace(/<think>[\s\S]*?(<\/think>|$)/g,'');if(t.indexOf('</think>')>=0)t=t.slice(t.lastIndexOf('</think>')+8);return t.replace(/<\/?think>/g,'').trim()};
+const vxClean=t=>{t=String(t||'').replace(/<think>[\s\S]*?(<\/think>|$)/g,'');if(t.indexOf('</think>')>=0)t=t.slice(t.lastIndexOf('</think>')+8);t=t.replace(/<\/?think>/g,'').trim();{const fm=[...t.matchAll(/final (?:decision|answer|response|output)[^\n:]*:\s*["“]?(.+?)["”]?\s*$/gim)];if(fm.length)t=fm[fm.length-1][1].trim()}return t};
 async function vxCall(provider,model,messages,{signal,onDelta}){
   const local=provider==='local',headers={'Content-Type':'application/json'};
   if(local){
@@ -3384,7 +3404,7 @@ async function vxCall(provider,model,messages,{signal,onDelta}){
   }else headers.Authorization='Bearer '+Vector.key();
   const stream=!!(local&&onDelta);
   const data=await vxFetch(local?VX_LOCAL+'/chat/completions':VX_GROQ,{method:'POST',headers,signal,
-    body:JSON.stringify(Object.assign({model,messages,stream},vxTune(provider,model))),onDelta:stream?t=>onDelta(/<\/think>/.test(t)||!/^\s*(okay|hmm|alright|let me|let's|first,|so,? the user|the user|looking at)/i.test(t)?vxClean(t):''):undefined});
+    body:JSON.stringify(Object.assign({model,messages:vxNoThink(provider,model,messages),stream},vxTune(provider,model))),onDelta:stream?t=>onDelta(/<\/think>/.test(t)||!/^\s*(okay|hmm|alright|let me|let's|first,|so,? the user|the user|looking at|we are|we're|as vector|i must|i need to|i should|the rule)/i.test(t)?vxClean(t):''):undefined});
   const ch=data&&data.choices&&data.choices[0],text=vxClean(ch&&ch.message&&ch.message.content);
   if(!text)throw new VxError('empty','empty completion');
   return {text,provider,model,cut:ch.finish_reason==='length'};
@@ -3805,12 +3825,33 @@ async function submitXtra(d){
   if(sc==='today')(S.extras[k]||(S.extras[k]=[])).push({id:newId('x'),label,time});
   else S.xrep.push({id:newId('r'),label,time,mode:sc==='day'?'day':'week',wd:vd.getDay(),from:k});
   save();render(true);toast(sc==='today'?'Waypoint added':sc==='day'?'Added for every day':'Added every week')}
+
+function vxNoThink(provider,model,msgs){if(provider!=='local'||!/qwen3|deepseek-r1|qwq/i.test(model))return msgs;const m=msgs.map(x=>Object.assign({},x));for(let i=m.length-1;i>=0;i--)if(m[i].role==='user'){m[i].content=String(m[i].content)+' /no_think';break}return m}
+Vector.fitWord=function(){const t=document.querySelector('.vx-wt');if(!t)return;let b;try{b=t.getBBox()}catch(_){return}if(!b||!b.width)return;const s=t.ownerSVGElement,x0=b.x-8;s.style.setProperty('--w',(b.width+16)+'px');const r=s.querySelector('.vx-wr'),d=s.querySelector('.vx-wd');r.setAttribute('x',x0);d.setAttribute('cx',x0);d.setAttribute('cy',b.y+b.height*.62)};
+
+/* wordmark: calm gradient text when idle; glitch split + centre lock only while VECTOR is thinking, eased in and out */
+(function(){const W='VECTOR',CH='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&/<>+=',ord=[2,3,1,4,0,5],rc=()=>CH[Math.floor(Math.random()*CH.length)],cl=x=>Math.max(0,Math.min(1,x)),j=()=>Math.random()-.5;
+let gi=0,last=0,tb=0,was=false;
+function f(t){requestAnimationFrame(f);const m=document.querySelector('.vx-gm');if(!m||document.hidden)return;const c=document.querySelector('.vx-gc'),v=document.querySelector('.vx-gv'),w=document.querySelector('.vx-gw');
+  const dt=Math.min(100,t-(last||t));last=t;const busy=!!Vector.busy&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(busy&&!was)tb=t;was=busy;
+  gi=cl(gi+(busy?dt/450:-dt/700));
+  if(gi<=0.001){if(m.textContent!==W){m.textContent=W;m.style.clipPath='none';c.style.opacity=v.style.opacity=0}w.style.opacity=1;w.style.transform='';return}
+  const ph=((t-tb)%2600)/2600,p=busy?cl(ph/.55):1;let o='',open=0;
+  for(let i=0;i<W.length;i++){const k=ord.indexOf(i)/(W.length-1);if(busy&&gi>.25&&p<k*.85+.15&&Math.random()<gi){o+=rc();open++}else o+=W[i]}
+  const g=gi*(busy?(open?Math.max(.3,1-p):(ph>.7&&ph<.78?.5:.12)):.4);
+  m.textContent=o;c.textContent=v.textContent=o;
+  const dx=g*9;c.style.transform='translate('+(-dx+j()*g*5)+'px,'+(j()*g*3)+'px)';v.style.transform='translate('+(dx+j()*g*5)+'px,'+(j()*g*3)+'px)';
+  c.style.opacity=v.style.opacity=g>.02?Math.min(.85,.3+g*.6):0;
+  m.style.clipPath=g>.05&&Math.random()<g*.4?'inset('+(Math.random()*55|0)+'% 0 '+(Math.random()*30|0)+'% 0)':'none';
+  w.style.opacity=1}
+requestAnimationFrame(f)})();
 /* typed placeholder in the ask box */
 (function(){const L=['Ask VECTOR anything.','Break down a concept.','Audit my day.','Plan my next block.','Why did I drift?','Debug this code for me.','Explain this circuit step by step.','Rebuild the rest of my day.','What should I do right now?','Quiz me on this topic.','Summarize what I missed.','Help me solve this problem.','How do I get back on schedule?','Compare two approaches for me.','Turn my notes into a study plan.'];let i=0,j=0,d=1,hold=0;
 setInterval(()=>{const q=document.getElementById('vxQ');if(!q||q.value||document.hidden)return;if(hold>0){hold--;return}
   const w=L[i];j+=d;q.placeholder=w.slice(0,j)+'_';if(j>=w.length){d=-1;hold=16}else if(j<=0){d=1;i=(i+1)%L.length;hold=4}},75)})();
 Vector.page=function(){if(!this._gt||Date.now()-this._gt>10*60000){this._gt=Date.now();this.greetE={t:'a',text:this.greetText(),tw:true}}this.pills=!this.log.length&&!this.last();setTimeout(()=>Vector.fmt(),0);setTimeout(()=>Vector.maybeAuto('open'),400);
-  return '<div class="vx-page"'+(this.warm()?' data-warm':'')+'><div class="vx-hero"><canvas class="vx-core" width="168" height="168" aria-hidden="true"></canvas><b class="vx-nm">'+[...'VECTOR'].map((c,k)=>'<i style="--i:'+k+'">'+c+'</i>').join('')+'</b><small class="vx-hs">ASK. BREAK IT DOWN. EXECUTE.</small></div>'+this.card()+'</div>'};
+  return '<div class="vx-page"'+(this.warm()?' data-warm':'')+'><div class="vx-hero"><canvas class="vx-core" width="168" height="168" aria-hidden="true"></canvas><div class="vx-gw" aria-label="VECTOR" role="img"><span class="vx-gl"><span class="vx-gm"></span><i class="vx-gc"></i><i class="vx-gv"></i></span></div><small class="vx-hs">ASK. BREAK IT DOWN. EXECUTE.</small></div>'+this.card()+'</div>'};
 /*V21*/
 /* ================= v21: swipe · readiness · shield · PR · focus lock · report · fuel · widget ================= */
 const SHIELD_COST=500,SHIELD_MAX=2,PR_XP=50,RING_XP={p:40,w:30};
